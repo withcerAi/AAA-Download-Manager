@@ -12,9 +12,9 @@ import re
 import shutil
 
 ROOT = Path(__file__).resolve().parents[1]
-TREES = ("src", "tests", "browser-extension", "installer", "legal", "locales", "media-tools", "scripts")
+TREES = ("src", "tests", "browser-extension", "installer", "legal", "locales", "media-tools", "scripts", ".github")
 ROOT_FILES = ("README.md", "LICENSE", "DISCLAIMER.md", "TERMS.md", "SECURITY.md", "CODE_SIGNING.md", ".gitignore", ".gitattributes", "NuGet.Config", "settings.schema.json")
-EXTENSIONS = {".cs", ".csproj", ".xaml", ".manifest", ".js", ".cjs", ".json", ".py", ".ps1", ".iss", ".isl", ".txt", ".md", ".png", ".ico"}
+EXTENSIONS = {".cs", ".csproj", ".xaml", ".manifest", ".js", ".cjs", ".json", ".py", ".ps1", ".iss", ".isl", ".txt", ".md", ".png", ".ico", ".yml", ".yaml"}
 EXCLUDED = {"bin", "obj", "node_modules", "__pycache__", ".git", ".vs", "artifacts", "release", "audit", "profiles", "test-artifacts"}
 SENSITIVE_NAMES = re.compile(r"^(?:\.env(?:\..*)?|secrets?\..*|credentials?\..*|cookies?\..*|downloads\.json|settings\.json|queues\.json|test-config\.json|e2e\.host\.json)$", re.I)
 PATTERNS = {
