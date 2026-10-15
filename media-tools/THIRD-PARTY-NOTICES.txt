@@ -1,0 +1,10 @@
+FFmpeg LGPL shared build
+Version: n9.0.2-27-g7e93014c5b-20261014
+Upstream: https://ffmpeg.org/
+FFmpeg source commit: https://github.com/FFmpeg/FFmpeg/tree/7e93014c5b
+Build provider and scripts: https://github.com/BtbN/FFmpeg-Builds
+Binary archive: ffmpeg-n9.0-latest-win64-lgpl-shared-9.0.zip
+Archive SHA-256: 70f5d603690ad245a4d8a90f99afd90452da6eb9fd2f9fe78d2a6e479a41ac3c
+Build configuration: shared DLLs, --disable-gpl, --enable-version3.
+License: GNU Lesser General Public License v3 or later; see LICENSE.txt.
+FFmpeg DLLs are distributed separately and may be replaced with compatible modified versions. No FFmpeg network protocols are used for downloading; the application passes local media files to FFmpeg for merging.

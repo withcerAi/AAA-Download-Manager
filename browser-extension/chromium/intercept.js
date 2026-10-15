@@ -1,0 +1,18 @@
+"use strict";
+(()=>{
+ if(globalThis.__downloadManagerRouting)return;globalThis.__downloadManagerRouting=true;
+ const api=globalThis.browser||globalThis.chrome;let options={enabled:false,extensions:"zip rar 7z exe msi iso pdf mp4 mkv mp3",excludedSites:""};
+ void api.storage.local.get(options).then(value=>options=value);api.storage.onChanged.addListener((changes,area)=>{if(area==="local")for(const key of Object.keys(options))if(key in changes)options[key]=changes[key].newValue;});
+ const passiveExtensions=new Set("json webmanifest js mjs cjs css map wasm xml html htm svg ico png jpg jpeg gif webp avif woff woff2 ttf mp4 webm mkv mov avi mp3 m4a ogg wav flac m3u8 mpd ts m4s aac".split(" "));
+ function wanted(url,force){try{const u=new URL(url,location.href);if(!["http:","https:"].includes(u.protocol))return false;const blocked=options.excludedSites.split(/[\s,;]+/).filter(Boolean).some(pattern=>{const escaped=pattern.replace(/[.+?^${}()|[\]\\]/g,"\\$&").replace(/\*/g,".*");return new RegExp("^"+escaped+"$","i").test(u.hostname)||new RegExp("^"+escaped+"$","i").test(u.href);});const suffix=(decodeURIComponent(u.pathname).split(".").pop()||"").toLowerCase();return !blocked&&(force||(!passiveExtensions.has(suffix)&&options.extensions.toLowerCase().split(/[\s,;]+/).includes((decodeURIComponent(u.pathname).split(".").pop()||"").toLowerCase())));}catch{return false;}}
+ async function send(url,context){try{const reply=await api.runtime.sendMessage({action:"intercept",url,context,pageUrl:location.href});if(!reply.ok)await api.runtime.sendMessage({action:"captureFailure",url,status:reply.status});}catch{}}
+ document.addEventListener("click",event=>{if(!options.enabled||event.defaultPrevented||(!event.isTrusted&&!navigator.userActivation?.isActive))return;const a=event.target.closest?.("a[href]");if(!a||!wanted(a.href,a.hasAttribute("download")))return;event.preventDefault();event.stopImmediatePropagation();void send(a.href);},true);
+ document.addEventListener("submit",event=>{if(!options.enabled||event.defaultPrevented||(!event.isTrusted&&!navigator.userActivation?.isActive))return;const form=event.target;if(!(form instanceof HTMLFormElement))return;const submitter=event.submitter;const url=new URL((submitter?.hasAttribute("formaction")?submitter.formAction:null)||form.action||location.href,location.href);if(!wanted(url.href,form.hasAttribute("data-download")))return;
+  event.preventDefault();event.stopImmediatePropagation();void(async()=>{const data=new FormData(form,submitter||undefined);const method=((submitter?.hasAttribute("formmethod")?submitter.formMethod:null)||form.method||"get").toUpperCase();if(method==="GET"){const query=new URLSearchParams();for(const[key,value]of data)query.append(key,typeof value==="string"?value:value.name);url.search=query.toString();return await send(url.href);}
+   if(method!=="POST")return;const enctype=(submitter?.hasAttribute("formenctype")?submitter.formEnctype:null)||form.enctype;let body,headers={};
+   if(enctype==="multipart/form-data"){const request=new Request(url,{method:"POST",body:data});headers["content-type"]=request.headers.get("content-type");body=new Uint8Array(await request.arrayBuffer());}
+   else{const query=new URLSearchParams();for(const[key,value]of data)query.append(key,typeof value==="string"?value:value.name);headers["content-type"]="application/x-www-form-urlencoded";body=new TextEncoder().encode(query.toString());}
+   if(body.length>262144)return await api.runtime.sendMessage({action:"captureFailure",url:url.href,status:"postUnavailable"});let binary="";for(const byte of body)binary+=String.fromCharCode(byte);await send(url.href,{url:url.href,method:"POST",headers,bodyBase64:btoa(binary)});
+  })().catch(()=>{});
+ },true);
+})();

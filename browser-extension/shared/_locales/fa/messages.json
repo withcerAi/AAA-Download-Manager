@@ -1,0 +1,35 @@
+{
+  "appName": {
+    "message": "AAA Download Manager"
+  },
+  "description": {
+    "message": "انتقال دانلودهای پشتیبانی‌شده به AAA Download Manager؛ روشن و خاموش با کلیک روی آیکون."
+  },
+  "accepted": {
+    "message": "لینک‌ها در برنامه پذیرفته شدند."
+  },
+  "cancelled": {
+    "message": "انتقال دانلود لغو شد."
+  },
+  "bridgeUnavailable": {
+    "message": "ارتباط برقرار نشد. میزبان بومی را از برنامه نصب یا ثبت کنید."
+  },
+  "extensionOn": {
+    "message": "AAA Download Manager: روشن — برای خاموش کردن کلیک کنید"
+  },
+  "extensionOff": {
+    "message": "AAA Download Manager: خاموش — برای روشن کردن کلیک کنید"
+  },
+  "routingUnavailable": {
+    "message": "اتصال مرورگر فعال نشد."
+  },
+  "unsupportedSource": {
+    "message": "این منبع قابل انتقال نیست."
+  },
+  "postUnavailable": {
+    "message": "درخواست اصلی POST در دسترس نیست؛ دوباره ارسال نشد."
+  },
+  "unavailable": {
+    "message": "برنامه در دسترس نیست."
+  }
+}

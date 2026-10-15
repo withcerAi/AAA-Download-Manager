@@ -1,0 +1,1361 @@
+{
+  "defaults": {
+    "startup": false,
+    "legacyMonitor": false,
+    "clipboard": false,
+    "advancedIntegration": true,
+    "browserChrome": true,
+    "browserEdge": true,
+    "browserFirefox": true,
+    "browserOpera": true,
+    "browserSafari": false,
+    "forceEnabled": true,
+    "forceCtrl": false,
+    "forceAlt": true,
+    "forceShift": false,
+    "preventEnabled": true,
+    "preventCtrl": false,
+    "preventAlt": false,
+    "preventShift": true,
+    "menuSingle": true,
+    "menuAll": true,
+    "menuSelected": true,
+    "menuVideos": true,
+    "menuChrome": true,
+    "menuFirefox": true,
+    "menuIE": false,
+    "panelVideo": true,
+    "panelAudio": true,
+    "panelSelected": true,
+    "panelSize": "full",
+    "panelPosition": "auto",
+    "panelFormats": "MP4 MKV WEBM M4A MP3 AAC TS",
+    "panelExceptions": "",
+    "panelShowOnPause": true,
+    "extensions": "7Z ZIP RAR EXE MSI ISO PDF DOC DOCX XLS XLSX PPT PPTX MP4 MKV WEBM AVI MOV MP3 M4A FLAC WAV",
+    "excludedSites": "*.example.test",
+    "excludedUrls": "",
+    "connectionType": "high",
+    "maxConnections": 8,
+    "parallel": 1,
+    "retryCount": 5,
+    "retryDelay": 10,
+    "timeout": 30,
+    "quotaEnabled": false,
+    "quotaMB": 200,
+    "quotaHours": 5,
+    "quotaWarning": true,
+    "speedLimit": "off",
+    "panelNoAutoDownload": true,
+    "temporaryFolder": "",
+    "useCategoryFolders": true,
+    "rememberCategoryFolder": true,
+    "serverCreationDate": false,
+    "showStart": true,
+    "showComplete": true,
+    "downloadWhilePrompting": false,
+    "queuePanelLater": true,
+    "queuePanelBatch": true,
+    "ignoreModifiedDate": false,
+    "duplicate": "ask",
+    "userAgent": "Mozilla/5.0",
+    "progressStart": "normal",
+    "progressSpeedTab": true,
+    "progressCompletionTab": true,
+    "progressHideTab": true,
+    "closeProgress": false,
+    "scannerEnabled": false,
+    "scannerPath": "",
+    "scannerArguments": "[File]",
+    "proxyMode": "none",
+    "browserProxy": true,
+    "pacUrl": "",
+    "proxyHost": "",
+    "proxyPort": 8080,
+    "proxyHTTP": true,
+    "proxyHTTPS": true,
+    "proxyFTP": true,
+    "socksEnabled": false,
+    "socksVersion": "5",
+    "socksHost": "",
+    "socksPort": 1080,
+    "proxyExceptions": "localhost; 127.0.0.1",
+    "ftpPassive": true,
+    "dialEnabled": false,
+    "dialConnection": "Windows VPN",
+    "dialSavePassword": false,
+    "dialAttempts": 0,
+    "dialDelay": 30,
+    "soundComplete": true,
+    "soundFailed": true,
+    "soundQueueStart": false,
+    "soundQueueEnd": false,
+    "soundCompleteFile": "System default",
+    "soundFailedFile": "System default",
+    "soundQueueStartFile": "System default",
+    "soundQueueEndFile": "System default",
+    "queueDaily": true,
+    "queueDays": "Mon Tue Wed Thu Fri Sat Sun",
+    "queueStartDate": "2026-10-14",
+    "queueEndDate": "",
+    "queueRetries": 3,
+    "queueRetryDelay": 30,
+    "queueDisconnect": false,
+    "queueForceShutdown": false,
+    "queueLaunchProgram": "",
+    "serverRules": [],
+    "customBrowsers": [],
+    "siteLogins": [],
+    "categories": [
+      {
+        "id": "general",
+        "name": "General",
+        "extensions": "",
+        "folder": ""
+      },
+      {
+        "id": "software",
+        "name": "Programs",
+        "extensions": "EXE MSI ISO",
+        "folder": ""
+      },
+      {
+        "id": "archive",
+        "name": "Compressed",
+        "extensions": "ZIP RAR 7Z",
+        "folder": ""
+      },
+      {
+        "id": "document",
+        "name": "Documents",
+        "extensions": "PDF DOCX XLSX PPTX",
+        "folder": ""
+      },
+      {
+        "id": "music",
+        "name": "Music",
+        "extensions": "MP3 M4A FLAC WAV",
+        "folder": ""
+      },
+      {
+        "id": "video",
+        "name": "Video",
+        "extensions": "MP4 MKV WEBM",
+        "folder": ""
+      }
+    ],
+    "showTray": true,
+    "minimizeToTray": true,
+    "wakeScheduled": false,
+    "progressMinimizeToTray": true,
+    "closeToTray": true
+  },
+  "sections": [
+    {
+      "id": "general",
+      "parent": null,
+      "titleKey": "ui.general",
+      "fields": [
+        {
+          "key": "startup",
+          "labelKey": "ui.launch_at_windows_startup",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "legacyMonitor",
+          "labelKey": "ui.run_click_monitoring_module_for_ie_based_browsers",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "clipboard",
+          "labelKey": "ui.automatically_download_urls_placed_on_the_clipboard",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "advancedIntegration",
+          "labelKey": "ui.use_advanced_browser_integration",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "browserChrome",
+          "labelKey": "ui.chrome",
+          "kind": "boolean"
+        },
+        {
+          "key": "browserEdge",
+          "labelKey": "ui.edge",
+          "kind": "boolean"
+        },
+        {
+          "key": "browserFirefox",
+          "labelKey": "ui.firefox",
+          "kind": "boolean"
+        },
+        {
+          "key": "browserOpera",
+          "labelKey": "ui.opera",
+          "kind": "boolean"
+        },
+        {
+          "key": "browserSafari",
+          "labelKey": "ui.safari",
+          "kind": "boolean"
+        },
+        {
+          "key": "showTray",
+          "labelKey": "native.showTray",
+          "kind": "boolean",
+          "depends": null
+        },
+        {
+          "key": "minimizeToTray",
+          "labelKey": "native.minimizeToTray",
+          "kind": "boolean",
+          "depends": "showTray"
+        },
+        {
+          "key": "wakeScheduled",
+          "labelKey": "native.wakeScheduled",
+          "kind": "boolean",
+          "depends": null
+        },
+        {
+          "key": "progressMinimizeToTray",
+          "kind": "boolean",
+          "labelKey": "native.progressMinimizeToTray",
+          "depends": "showTray"
+        },
+        {
+          "key": "closeToTray",
+          "labelKey": "native.closeToTray",
+          "kind": "boolean",
+          "depends": null
+        }
+      ]
+    },
+    {
+      "id": "types",
+      "parent": null,
+      "titleKey": "ui.file_types",
+      "fields": [
+        {
+          "key": "extensions",
+          "labelKey": "ui.file_extensions",
+          "kind": "textarea",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "excludedSites",
+          "labelKey": "ui.do_not_automatically_capture_from",
+          "kind": "textarea",
+          "depends": null,
+          "secret": false
+        }
+      ]
+    },
+    {
+      "id": "connection",
+      "parent": null,
+      "titleKey": "ui.connection",
+      "fields": [
+        {
+          "key": "connectionType",
+          "labelKey": "ui.connection_type_speed",
+          "kind": "text",
+          "depends": null,
+          "secret": false,
+          "choices": [
+            {
+              "value": "high",
+              "labelKey": "ui.high_speed_ethernet_wi_fi_mobile"
+            },
+            {
+              "value": "medium",
+              "labelKey": "ui.medium_speed_dsl"
+            },
+            {
+              "value": "low",
+              "labelKey": "ui.low_speed_dial_up"
+            },
+            {
+              "value": "custom",
+              "labelKey": "ui.custom"
+            }
+          ]
+        },
+        {
+          "key": "maxConnections",
+          "labelKey": "ui.default_maximum_connections",
+          "kind": "text",
+          "depends": null,
+          "secret": false,
+          "choices": [
+            {
+              "value": "1",
+              "labelKey": null
+            },
+            {
+              "value": "2",
+              "labelKey": null
+            },
+            {
+              "value": "4",
+              "labelKey": null
+            },
+            {
+              "value": "8",
+              "labelKey": null
+            },
+            {
+              "value": "16",
+              "labelKey": null
+            },
+            {
+              "value": "24",
+              "labelKey": null
+            },
+            {
+              "value": "32",
+              "labelKey": null
+            }
+          ]
+        },
+        {
+          "key": "speedLimit",
+          "labelKey": "settings.speed_limit",
+          "kind": "text",
+          "depends": null,
+          "secret": false,
+          "choices": [
+            {
+              "value": "off",
+              "labelKey": "settings.no_speed_limit"
+            },
+            {
+              "value": "2 MB/s",
+              "labelKey": null
+            },
+            {
+              "value": "5 MB/s",
+              "labelKey": null
+            },
+            {
+              "value": "10 MB/s",
+              "labelKey": null
+            }
+          ]
+        },
+        {
+          "key": "parallel",
+          "labelKey": "native.global_parallel",
+          "kind": "number",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "quotaEnabled",
+          "labelKey": "ui.enable_download_limits",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "quotaMB",
+          "labelKey": "ui.download_no_more_than_mb",
+          "kind": "number",
+          "depends": "quotaEnabled",
+          "secret": false
+        },
+        {
+          "key": "quotaHours",
+          "labelKey": "ui.every_hours",
+          "kind": "number",
+          "depends": "quotaEnabled",
+          "secret": false
+        },
+        {
+          "key": "quotaWarning",
+          "labelKey": "ui.warn_before_stopping_downloads",
+          "kind": "boolean",
+          "depends": "quotaEnabled",
+          "secret": false
+        }
+      ]
+    },
+    {
+      "id": "saveTo",
+      "parent": null,
+      "titleKey": "ui.save_to",
+      "fields": [
+        {
+          "key": "downloadDirectory",
+          "labelKey": "ui.download_folder",
+          "kind": "folder"
+        },
+        {
+          "key": "useCategoryFolders",
+          "labelKey": "ui.save_files_in_their_category_folder",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "categories",
+          "labelKey": "category.folders",
+          "kind": "table",
+          "columns": [
+            {
+              "key": "name",
+              "labelKey": "ui.category_2"
+            },
+            {
+              "key": "extensions",
+              "labelKey": "native.extensions"
+            },
+            {
+              "key": "folder",
+              "labelKey": "ui.default_folder"
+            }
+          ]
+        },
+        {
+          "key": "rememberCategoryFolder",
+          "labelKey": "ui.update_category_folder_to_the_last_chosen_location",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "serverCreationDate",
+          "labelKey": "ui.set_file_creation_date_from_the_server",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "temporaryFolder",
+          "labelKey": "ui.temporary_directory",
+          "kind": "text",
+          "depends": null,
+          "secret": false
+        }
+      ]
+    },
+    {
+      "id": "downloads",
+      "parent": null,
+      "titleKey": "ui.downloads",
+      "fields": [
+        {
+          "key": "showStart",
+          "labelKey": "ui.show_start_download_dialog",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "showComplete",
+          "labelKey": "native.show_completion_summary",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "downloadWhilePrompting",
+          "labelKey": "ui.start_downloading_while_the_file_information_dialog_is_open",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "queuePanelLater",
+          "labelKey": "ui.show_queue_selector_when_download_later_is_pressed",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "queuePanelBatch",
+          "labelKey": "ui.show_queue_selector_after_batch_download_dialogs",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "ignoreModifiedDate",
+          "labelKey": "ui.ignore_file_modification_time_changes_when_resuming",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "duplicate",
+          "labelKey": "ui.if_a_duplicate_download_link_is_added",
+          "kind": "text",
+          "depends": null,
+          "secret": false,
+          "choices": [
+            {
+              "value": "ask",
+              "labelKey": "ui.show_a_dialog_and_ask"
+            },
+            {
+              "value": "rename",
+              "labelKey": "ui.add_a_numbered_filename"
+            },
+            {
+              "value": "replace",
+              "labelKey": "ui.overwrite_existing_file"
+            },
+            {
+              "value": "resume",
+              "labelKey": "ui.resume_the_existing_download"
+            }
+          ]
+        },
+        {
+          "key": "userAgent",
+          "labelKey": "ui.user_agent_for_manually_added_urls",
+          "kind": "text",
+          "depends": null,
+          "secret": false
+        }
+      ]
+    },
+    {
+      "id": "proxy",
+      "parent": null,
+      "titleKey": "ui.proxy_socks",
+      "fields": [
+        {
+          "key": "browserProxy",
+          "labelKey": "ui.use_the_browser_request_proxy_if_an_intercepted_download_fails",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "proxyMode",
+          "labelKey": "ui.proxy_mode",
+          "kind": "text",
+          "depends": null,
+          "secret": false,
+          "choices": [
+            {
+              "value": "none",
+              "labelKey": "ui.no_proxy_socks"
+            },
+            {
+              "value": "system",
+              "labelKey": "settings.use_system_proxy"
+            },
+            {
+              "value": "pac",
+              "labelKey": "ui.automatic_configuration_script"
+            },
+            {
+              "value": "manual",
+              "labelKey": "ui.manual_configuration"
+            }
+          ]
+        },
+        {
+          "key": "pacUrl",
+          "labelKey": "ui.pac_script_url",
+          "kind": "url",
+          "depends": "proxyMode=pac",
+          "secret": false
+        },
+        {
+          "key": "proxyHost",
+          "labelKey": "ui.server_address",
+          "kind": "text",
+          "depends": "proxyMode=manual",
+          "secret": false
+        },
+        {
+          "key": "proxyPort",
+          "labelKey": "ui.port_2",
+          "kind": "number",
+          "depends": "proxyMode=manual",
+          "secret": false
+        },
+        {
+          "key": "proxyUser",
+          "labelKey": "ui.username_2",
+          "kind": "text",
+          "depends": "proxyMode=manual",
+          "secret": true
+        },
+        {
+          "key": "proxyPassword",
+          "labelKey": "ui.password_2",
+          "kind": "password",
+          "depends": "proxyMode=manual",
+          "secret": true
+        },
+        {
+          "key": "ftpPassive",
+          "labelKey": "ui.use_ftp_in_passive_pasv_mode",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "ftpUser",
+          "labelKey": "native.ftp_user",
+          "kind": "text",
+          "secret": true
+        },
+        {
+          "key": "ftpPassword",
+          "labelKey": "native.ftp_password",
+          "kind": "password",
+          "secret": true
+        }
+      ]
+    },
+    {
+      "id": "sites",
+      "parent": null,
+      "titleKey": "ui.site_logins",
+      "fields": [
+        {
+          "key": "siteLogins",
+          "labelKey": "ui.actions",
+          "kind": "table",
+          "columns": [
+            {
+              "key": "url",
+              "labelKey": "ui.url_directory"
+            },
+            {
+              "key": "username",
+              "labelKey": "ui.username_2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dialup",
+      "parent": null,
+      "titleKey": "ui.dial_up_vpn",
+      "fields": [
+        {
+          "key": "dialEnabled",
+          "labelKey": "ui.use_windows_dial_up_vpn_networking",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "dialConnection",
+          "labelKey": "ui.connection_name",
+          "kind": "text",
+          "depends": "dialEnabled",
+          "secret": false
+        },
+        {
+          "key": "dialUser",
+          "labelKey": "ui.username_2",
+          "kind": "text",
+          "depends": "dialEnabled",
+          "secret": true
+        },
+        {
+          "key": "dialPassword",
+          "labelKey": "ui.password_2",
+          "kind": "password",
+          "depends": "dialEnabled",
+          "secret": true
+        },
+        {
+          "key": "dialSavePassword",
+          "labelKey": "ui.remember_password",
+          "kind": "boolean",
+          "depends": "dialEnabled",
+          "secret": false
+        },
+        {
+          "key": "dialAttempts",
+          "labelKey": "ui.redial_attempts_0_unlimited",
+          "kind": "number",
+          "depends": "dialEnabled",
+          "secret": false
+        },
+        {
+          "key": "dialDelay",
+          "labelKey": "ui.time_between_attempts_seconds",
+          "kind": "number",
+          "depends": "dialEnabled",
+          "secret": false
+        }
+      ]
+    },
+    {
+      "id": "sounds",
+      "parent": null,
+      "titleKey": "ui.sounds",
+      "fields": [
+        {
+          "key": "soundComplete",
+          "labelKey": "ui.download_completed",
+          "kind": "boolean"
+        },
+        {
+          "key": "soundCompleteFile",
+          "labelKey": "ui.sound_file_path",
+          "kind": "text",
+          "depends": "soundComplete"
+        },
+        {
+          "key": "soundFailed",
+          "labelKey": "ui.download_failed",
+          "kind": "boolean"
+        },
+        {
+          "key": "soundFailedFile",
+          "labelKey": "ui.sound_file_path",
+          "kind": "text",
+          "depends": "soundFailed"
+        },
+        {
+          "key": "soundQueueStart",
+          "labelKey": "ui.queue_processing_started",
+          "kind": "boolean"
+        },
+        {
+          "key": "soundQueueStartFile",
+          "labelKey": "ui.sound_file_path",
+          "kind": "text",
+          "depends": "soundQueueStart"
+        },
+        {
+          "key": "soundQueueEnd",
+          "labelKey": "ui.queue_stopped_finished",
+          "kind": "boolean"
+        },
+        {
+          "key": "soundQueueEndFile",
+          "labelKey": "ui.sound_file_path",
+          "kind": "text",
+          "depends": "soundQueueEnd"
+        }
+      ]
+    },
+    {
+      "id": "queue",
+      "parent": null,
+      "titleKey": "ui.queue_scheduler",
+      "fields": [
+        {
+          "key": "queueDaily",
+          "labelKey": "ui.repeat_on_selected_days",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "queueDays",
+          "labelKey": "ui.days_of_week",
+          "kind": "text",
+          "depends": "queueDaily",
+          "secret": false
+        },
+        {
+          "key": "queueStartDate",
+          "labelKey": "ui.start_date",
+          "kind": "date",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "queueEndDate",
+          "labelKey": "ui.end_date_optional",
+          "kind": "date",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "queueRetries",
+          "labelKey": "ui.attempts_for_failed_files",
+          "kind": "number",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "queueRetryDelay",
+          "labelKey": "ui.retry_interval_seconds",
+          "kind": "number",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "queueDisconnect",
+          "labelKey": "ui.disconnect_dial_up_vpn",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "queueForceShutdown",
+          "labelKey": "ui.force_applications_to_close_when_shutting_down",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "queueLaunchProgram",
+          "labelKey": "ui.launch_program_command",
+          "kind": "text",
+          "depends": null,
+          "secret": false
+        }
+      ]
+    },
+    {
+      "id": "keys",
+      "parent": "general",
+      "titleKey": "settings.browser.special_keys",
+      "fields": [
+        {
+          "key": "forceEnabled",
+          "labelKey": "ui.enable_force_download_shortcut",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "preventEnabled",
+          "labelKey": "ui.enable_prevent_download_shortcut",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "forceCtrl",
+          "labelKey": "ui.ctrl",
+          "kind": "boolean",
+          "depends": "forceEnabled"
+        },
+        {
+          "key": "forceAlt",
+          "labelKey": "ui.alt",
+          "kind": "boolean",
+          "depends": "forceEnabled"
+        },
+        {
+          "key": "forceShift",
+          "labelKey": "ui.shift",
+          "kind": "boolean",
+          "depends": "forceEnabled"
+        },
+        {
+          "key": "preventCtrl",
+          "labelKey": "ui.ctrl",
+          "kind": "boolean",
+          "depends": "preventEnabled"
+        },
+        {
+          "key": "preventAlt",
+          "labelKey": "ui.alt",
+          "kind": "boolean",
+          "depends": "preventEnabled"
+        },
+        {
+          "key": "preventShift",
+          "labelKey": "ui.shift",
+          "kind": "boolean",
+          "depends": "preventEnabled"
+        }
+      ]
+    },
+    {
+      "id": "context",
+      "parent": "general",
+      "titleKey": "settings.browser.context_menu",
+      "fields": [
+        {
+          "key": "menuSingle",
+          "labelKey": "ui.download_this_link",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "menuAll",
+          "labelKey": "ui.download_all_links",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "menuSelected",
+          "labelKey": "ui.download_selected_links",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "menuVideos",
+          "labelKey": "ui.download_videos_media",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "menuChrome",
+          "labelKey": "ui.chromium_based_browsers",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "menuFirefox",
+          "labelKey": "ui.firefox",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "menuIE",
+          "labelKey": "ui.internet_explorer_legacy_browsers",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        }
+      ]
+    },
+    {
+      "id": "panels",
+      "parent": "general",
+      "titleKey": "settings.browser.download_panels",
+      "fields": [
+        {
+          "key": "panelNoAutoDownload",
+          "labelKey": "settings.no_auto_player",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "panelVideo",
+          "labelKey": "ui.show_download_panel_on_video_players",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "panelAudio",
+          "labelKey": "ui.show_download_panel_on_audio_players",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "panelSelected",
+          "labelKey": "ui.show_panel_for_selected_links",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "panelShowOnPause",
+          "labelKey": "ui.keep_panel_visible_when_playback_is_paused",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "panelSize",
+          "labelKey": "ui.panel_size",
+          "kind": "text",
+          "depends": null,
+          "secret": false,
+          "choices": [
+            {
+              "value": "full",
+              "labelKey": "ui.full_panel"
+            },
+            {
+              "value": "small",
+              "labelKey": "ui.small_button"
+            }
+          ]
+        },
+        {
+          "key": "panelPosition",
+          "labelKey": "ui.panel_position",
+          "kind": "text",
+          "depends": null,
+          "secret": false,
+          "choices": [
+            {
+              "value": "auto",
+              "labelKey": "ui.automatic"
+            },
+            {
+              "value": "top",
+              "labelKey": "ui.top_of_player"
+            },
+            {
+              "value": "bottom",
+              "labelKey": "ui.bottom_of_player"
+            }
+          ]
+        },
+        {
+          "key": "panelFormats",
+          "labelKey": "ui.media_formats",
+          "kind": "textarea",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "panelExceptions",
+          "labelKey": "ui.excluded_pages_players",
+          "kind": "textarea",
+          "depends": null,
+          "secret": false
+        }
+      ]
+    },
+    {
+      "id": "browsers",
+      "parent": "general",
+      "titleKey": "settings.browser.custom_browsers",
+      "fields": [
+        {
+          "key": "customBrowsers",
+          "labelKey": "ui.actions",
+          "kind": "table",
+          "columns": [
+            {
+              "key": "name",
+              "labelKey": "ui.browser_name"
+            },
+            {
+              "key": "path",
+              "labelKey": "ui.executable_path"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "urls",
+      "parent": "types",
+      "titleKey": "settings.capture.address_exceptions",
+      "fields": [
+        {
+          "key": "excludedUrls",
+          "labelKey": "ui.do_not_capture_these_addresses",
+          "kind": "textarea",
+          "depends": null,
+          "secret": false
+        }
+      ]
+    },
+    {
+      "id": "servers",
+      "parent": "connection",
+      "titleKey": "settings.connection.server_exceptions",
+      "fields": [
+        {
+          "key": "serverRules",
+          "labelKey": "ui.actions",
+          "kind": "table",
+          "columns": [
+            {
+              "key": "host",
+              "labelKey": "ui.server_url_pattern"
+            },
+            {
+              "key": "connections",
+              "labelKey": "ui.maximum_connections"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "recovery",
+      "parent": "connection",
+      "titleKey": "ui.retry_timeout_settings",
+      "fields": [
+        {
+          "key": "retryCount",
+          "labelKey": "ui.retry_attempts_2",
+          "kind": "number",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "retryDelay",
+          "labelKey": "ui.retry_interval_seconds",
+          "kind": "number",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "timeout",
+          "labelKey": "ui.connection_timeout_seconds",
+          "kind": "number",
+          "depends": null,
+          "secret": false
+        }
+      ]
+    },
+    {
+      "id": "progress",
+      "parent": "downloads",
+      "titleKey": "ui.download_progress_window",
+      "fields": [
+        {
+          "key": "progressStart",
+          "labelKey": "ui.start_view",
+          "kind": "text",
+          "depends": null,
+          "secret": false,
+          "choices": [
+            {
+              "value": "normal",
+              "labelKey": "ui.show_normally_sized"
+            },
+            {
+              "value": "minimized",
+              "labelKey": "ui.show_minimized"
+            },
+            {
+              "value": "hidden",
+              "labelKey": "ui.do_not_show"
+            },
+            {
+              "value": "tray",
+              "labelKey": "ui.minimize_to_system_tray"
+            }
+          ]
+        },
+        {
+          "key": "progressSpeedTab",
+          "labelKey": "ui.show_speed_limiter_tab",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "progressCompletionTab",
+          "labelKey": "ui.show_on_completion_tab",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "progressHideTab",
+          "labelKey": "ui.show_hide_tab_buttons",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "closeProgress",
+          "labelKey": "ui.close_progress_window_after_completion",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        }
+      ]
+    },
+    {
+      "id": "antivirus",
+      "parent": "downloads",
+      "titleKey": "ui.virus_checking",
+      "fields": [
+        {
+          "key": "scannerEnabled",
+          "labelKey": "ui.run_virus_scanner_after_download_completion",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "scannerPath",
+          "labelKey": "ui.scanner_executable",
+          "kind": "text",
+          "depends": "scannerEnabled",
+          "secret": false
+        },
+        {
+          "key": "scannerArguments",
+          "labelKey": "ui.command_line_parameters",
+          "kind": "text",
+          "depends": "scannerEnabled",
+          "secret": false
+        }
+      ]
+    },
+    {
+      "id": "socks",
+      "parent": "proxy",
+      "titleKey": "ui.advanced_proxy_socks",
+      "fields": [
+        {
+          "key": "socksEnabled",
+          "labelKey": "ui.use_socks_server",
+          "kind": "boolean",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "socksVersion",
+          "labelKey": "ui.socks_version",
+          "kind": "text",
+          "depends": "socksEnabled",
+          "secret": false,
+          "choices": [
+            {
+              "value": "4",
+              "labelKey": null
+            },
+            {
+              "value": "5",
+              "labelKey": null
+            }
+          ]
+        },
+        {
+          "key": "socksHost",
+          "labelKey": "ui.socks_address",
+          "kind": "text",
+          "depends": "socksEnabled",
+          "secret": false
+        },
+        {
+          "key": "socksPort",
+          "labelKey": "ui.socks_port",
+          "kind": "number",
+          "depends": "socksEnabled",
+          "secret": false
+        },
+        {
+          "key": "socksUser",
+          "labelKey": "ui.username_2",
+          "kind": "text",
+          "depends": "socksEnabled",
+          "secret": true
+        },
+        {
+          "key": "socksPassword",
+          "labelKey": "ui.password_2",
+          "kind": "password",
+          "depends": "socksEnabled",
+          "secret": true
+        },
+        {
+          "key": "proxyExceptions",
+          "labelKey": "ui.do_not_use_proxy_for",
+          "kind": "textarea",
+          "depends": null,
+          "secret": false
+        },
+        {
+          "key": "proxyHTTPHost",
+          "labelKey": "ui.server",
+          "kind": "text"
+        },
+        {
+          "key": "proxyHTTPPort",
+          "labelKey": "ui.port",
+          "kind": "number"
+        },
+        {
+          "key": "proxyHTTPSHost",
+          "labelKey": "ui.server",
+          "kind": "text"
+        },
+        {
+          "key": "proxyHTTPSPort",
+          "labelKey": "ui.port",
+          "kind": "number"
+        },
+        {
+          "key": "proxyFTPHost",
+          "labelKey": "ui.server",
+          "kind": "text"
+        },
+        {
+          "key": "proxyFTPPort",
+          "labelKey": "ui.port",
+          "kind": "number"
+        }
+      ]
+    },
+    {
+      "id": "appearance",
+      "titleKey": "ui.appearance_language",
+      "fields": [
+        {
+          "key": "language",
+          "labelKey": "ui.application_language",
+          "kind": "locale"
+        },
+        {
+          "key": "palette",
+          "labelKey": "ui.color_palette",
+          "kind": "text",
+          "choices": [
+            {
+              "value": "classic",
+              "labelKey": "ui.classic_blue"
+            },
+            {
+              "value": "graphite",
+              "labelKey": "ui.graphite"
+            },
+            {
+              "value": "emerald",
+              "labelKey": "ui.emerald"
+            },
+            {
+              "value": "violet",
+              "labelKey": "ui.violet"
+            },
+            {
+              "value": "amber",
+              "labelKey": "ui.warm_amber"
+            }
+          ]
+        },
+        {
+          "key": "appearance",
+          "labelKey": "ui.display_mode",
+          "kind": "text",
+          "choices": [
+            {
+              "value": "system",
+              "labelKey": "ui.system"
+            },
+            {
+              "value": "light",
+              "labelKey": "ui.light"
+            },
+            {
+              "value": "dark",
+              "labelKey": "ui.dark"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

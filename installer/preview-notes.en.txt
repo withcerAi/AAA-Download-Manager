@@ -1,0 +1,7 @@
+AAA Download Manager 0.5.5 Preview
+
+This preview includes download queues, scheduling, browser integration, metadata previews and batch link checks. Features depend on server, browser and operating-system support.
+
+Review the Terms of Use, Risk Notice, Warranty Disclaimer and Limitation of Liability on the installer's license page. Installation requires acceptance. Keep backups and verify downloaded files before opening them.
+
+Chrome and Firefox extensions use a single ON/OFF toolbar action. Firefox permanent installation requires Mozilla signing; the supplied package supports temporary developer loading.
