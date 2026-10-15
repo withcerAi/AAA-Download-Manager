@@ -1,4 +1,5 @@
 using System.IO;
+using System.Diagnostics;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
@@ -7,6 +8,7 @@ namespace DownloadManager.Desktop;
 
 public sealed class AboutWindow : Window
 {
+    public const string RepositoryUrl = "https://github.com/withcerAi/AAA-Download-Manager";
     public AboutWindow(LocaleCatalog locale)
     {
         Title = locale.S("ui.about_download_manager"); Width = 650; Height = 590;
@@ -25,6 +27,17 @@ public sealed class AboutWindow : Window
         {
             var text = Ui.Label(locale, key, true); text.TextWrapping = TextWrapping.Wrap; text.Margin = new Thickness(0, 0, 0, 14); body.Children.Add(text);
         }
+        var repository = Ui.Button(locale, "about.github", (_, _) =>
+        {
+            try { Process.Start(new ProcessStartInfo(RepositoryUrl) { UseShellExecute = true }); }
+            catch (Exception error) when (error is System.ComponentModel.Win32Exception or InvalidOperationException)
+            {
+                new AppDialog(locale, locale.S("about.github_error"), locale.S("ui.download_manager"), icon: MessageBoxImage.Error) { Owner = this }.ShowDialog();
+            }
+        });
+        repository.HorizontalAlignment = HorizontalAlignment.Left; repository.ToolTip = RepositoryUrl;
+        body.Children.Add(repository);
+        body.Children.Add(new TextBlock { Text = RepositoryUrl, FlowDirection = FlowDirection.LeftToRight, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 4, 0, 14) });
         var documents = new WrapPanel();
         AddDocument("about.terms", "about.legal_title", "legal/TERMS-OF-USE.txt");
         AddDocument("about.third_party", "about.notices_title", "media-tools/THIRD-PARTY-NOTICES.txt");

@@ -838,6 +838,8 @@
     "inspect.notice": "Checks use server headers only. Availability and size may change before download.",
     "inspect.cancelled": "Check cancelled",
     "about.version": "Version {version} · Preview",
+    "about.github": "Source code on GitHub",
+    "about.github_error": "Could not open your browser. Open the repository address shown in About manually.",
     "about.description": "AAA Download Manager brings browser and direct-link downloads into one workspace. Review the files before you start, control ongoing transfers, and choose where each category is saved.",
     "about.languages": "English and Persian, with full left-to-right and right-to-left layouts.",
     "about.terms": "Terms of use & liability notice",

@@ -52,7 +52,7 @@ internal static class Program
                 var about = new AboutWindow(catalog); Render(about, Path.Combine(directory,"about-"+language+"-"+mode+".png"), 630, 560);
                 var aboutTexts=Visuals((DependencyObject)about.Content).OfType<TextBlock>().Select(t=>t.Text).ToArray();
                 Check(aboutTexts.Contains("AAA Download Manager") && aboutTexts.Any(t=>t.Contains(typeof(AboutWindow).Assembly.GetName().Version!.ToString(3))) && !aboutTexts.Any(t=>t.Contains("0.1.0")), "about_brand_version_current");
-                Check(about.FlowDirection==catalog.Direction && Visuals((DependencyObject)about.Content).OfType<Button>().Count()==4,"about_legal_links_and_rtl"); about.Close();
+                Check(about.FlowDirection==catalog.Direction && Visuals((DependencyObject)about.Content).OfType<Button>().Count()==5 && aboutTexts.Contains(AboutWindow.RepositoryUrl),"about_legal_links_and_rtl"); about.Close();
                 var legal=new LegalDocumentWindow(catalog,catalog.S("about.legal_title"),"legal/TERMS-OF-USE.txt");
                 Render(legal,Path.Combine(directory,"terms-"+language+"-"+mode+".png"),800,600);
                 var legalText=Visuals((DependencyObject)legal.Content).OfType<TextBox>().Single();
