@@ -1,14 +1,26 @@
-# Windows installer — 0.4.4 preview
+# Windows installer — 0.5.5 preview
 
-Build with `build.ps1 -Dotnet <dotnet.exe> -Compiler <ISCC.exe>` using .NET SDK 10 and Inno Setup 6.7.3. The compiler source is available from https://jrsoftware.org/isdl.php. Commercial distribution requires reviewing the compiler's commercial license terms. The bundled Farsi installer translation comes from the official `jrsoftware/issrc` repository, tag `is-6_7_3`, `Files/Languages/Unofficial/Farsi.isl`; author attribution is retained in that file.
+Build on Windows using the .NET 10 SDK and Inno Setup 6.7.3:
 
-The stable AppId supports upgrades in place. Default destination is `%LOCALAPPDATA%\Programs\DownloadManager`; application data remains in `%LOCALAPPDATA%\DownloadManager`. Files are self-contained for Windows x64, without a separate .NET installation or network bootstrapper. The installer supports English and Persian, system light/dark appearance, optional desktop shortcut, Start menu shortcuts, standard Windows uninstall registration and an unchecked launch option. Silent installs never launch the app.
+```powershell
+./installer/build.ps1 -Dotnet <dotnet.exe> -Compiler <ISCC.exe>
+```
 
-No browser registration, startup registration or firewall changes occur during installation. Browser integration is explicitly connected in the application after manually installing the extension. Uninstall runs the browser host's ownership-checked unregister commands before removing binaries. It preserves application data and downloaded files; it does not recursively delete arbitrary folders.
+Obtain Inno Setup from https://jrsoftware.org/isdl.php and review its current licensing terms. The bundled Farsi translation comes from the official jrsoftware/issrc repository, tag is-6_7_3, Files/Languages/Unofficial/Farsi.isl; its attribution is retained.
 
-The application and generated installer are unsigned development previews. Do not present them as a complete IDM replacement or a signed commercial release.
+The source repository excludes binaries. Full media-enabled packaging requires the optional LGPL runtime described in ../media-tools/README.md. The build script publishes self-contained Windows x64 desktop and native-host output before compiling the installer. It does not sign the resulting package.
 
+The stable application ID supports upgrades. Installation defaults to %LOCALAPPDATA%\Programs\DownloadManager and application data remains in %LOCALAPPDATA%\DownloadManager. Interactive installation requires reviewing the English terms. Authorized unattended installs require /ACCEPTTERMS=1; silent installs never launch the application.
 
-Version 0.4.4 bundles the Chrome/Edge extension 0.4.4, its toolbar-only ON/OFF toggle, and local FFmpeg shared media tools. Chrome still requires manual Load unpacked installation; see the installed Chrome-Extension.fa.txt guide. This installer does not silently modify the user's browser.
+The installer offers desktop shortcuts and current-user native messaging registration for Chrome, Edge and Firefox. The browser bridge task is selected by default and can be deselected. Extensions still require browser-side installation; the installer does not silently load them or change firewall rules. Uninstall removes only owned native-host registrations and application binaries, preserving settings and downloaded files.
 
-Installer regression uses an alternate AppId (83018A7C-D1CA-4E54-9510-B464A2540420), a workspace destination, no shortcuts, and CloseApplications=no, so it cannot replace the user's normal installation registration. Compile with /DSetupAppId=83018A7C-D1CA-4E54-9510-B464A2540420 /DSetupFileName=DownloadManager-0.4.4-Isolated-Test /DIsolatedTest, then run smoke-test.ps1 -Root <repository>. The production AppId is unchanged.
+The included extensions are version 0.5.3 with a toolbar ON/OFF action. Standard Firefox requires Mozilla signing for permanent extension installation. The desktop and installer remain unsigned previews; see ../CODE_SIGNING.md.
+
+For isolated installation tests, compile with:
+
+```powershell
+ISCC /DSetupAppId=83018A7C-D1CA-4E54-9510-B464A2540420 /DSetupFileName=AAA-Download-Manager-0.5.5-Isolated-Test /DIsolatedTest installer/DownloadManager.iss
+./installer/smoke-test.ps1 -Root <repository>
+```
+
+The alternate test identity, workspace destination and disabled application closing protect the regular installation. Production keeps application ID 167AB087-C613-423C-9984-84448870E972.
