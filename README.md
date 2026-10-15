@@ -1,5 +1,7 @@
 # AAA Download Manager
 
+[![Windows build and tests](https://github.com/withcerAi/AAA-Download-Manager/actions/workflows/windows-build.yml/badge.svg)](https://github.com/withcerAi/AAA-Download-Manager/actions/workflows/windows-build.yml)
+
 A native Windows download manager built with C# / .NET 10 and WPF. The interface defaults to English and supports Persian, including right-to-left layouts. Independent JSON language files allow additional translations.
 
 > **Preview software.** Read the [important risk and liability notice](DISCLAIMER.md) and the [complete terms](TERMS.md) before installing or using it. The software is provided as is, subject to mandatory legal protections. Maintain backups and verify downloaded files before opening them.
@@ -43,6 +45,8 @@ Help > About shows the current application version and opens the complete Englis
 AAA Download Manager is an independent project. Product and browser names identify compatibility and do not imply affiliation or endorsement. Applying this product name does not establish trademark registration.
 
 ## Build and testing
+
+GitHub Actions builds and tests the project on a GitHub-hosted Windows runner for pushes to `main`, pull requests and manual runs. Successful runs provide an unsigned, self-contained Windows x64 application under **Artifacts**. It includes the browser host and extension sources; the optional FFmpeg runtime and installer are not included. The artifact records its source commit and build run. This workflow does not perform code signing or publish a GitHub Release.
 
 Use the .NET 10 SDK on Windows:
 
