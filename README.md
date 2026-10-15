@@ -4,6 +4,10 @@
 
 A native Windows download manager built with C# / .NET 10 and WPF. The interface defaults to English and supports Persian, including right-to-left layouts. Independent JSON language files allow additional translations.
 
+![AAA Download Manager — English interface](docs/images/aaa-download-manager-en.png)
+
+*English interface in the dark theme, shown with sample download entries.*
+
 > **Preview software.** Read the [important risk and liability notice](DISCLAIMER.md) and the [complete terms](TERMS.md) before installing or using it. The software is provided as is, subject to mandatory legal protections. Maintain backups and verify downloaded files before opening them.
 
 ## Downloads and installation
