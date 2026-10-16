@@ -284,7 +284,7 @@
     "ui.keep_panel_visible_when_playback_is_paused": "Keep panel visible when playback is paused",
     "ui.language": "Language",
     "ui.last_60_seconds_sample_data": "Last 60 seconds · Sample data",
-    "ui.launch_at_windows_startup": "Launch at Windows startup",
+    "ui.launch_at_windows_startup": "Start with Windows in the notification area",
     "ui.launch_program_command": "Launch program / command",
     "ui.light": "Light",
     "ui.limit_connections_for_individual_hosts_or_url_patterns": "Limit connections for individual hosts or URL patterns.",

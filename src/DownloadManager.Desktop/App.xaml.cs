@@ -36,6 +36,7 @@ public partial class App : Application
         try
         {
             var customData = Argument(args.Args, "--data-dir");
+            var automaticStartup = args.Args.Contains(StartupLaunch.Argument, StringComparer.OrdinalIgnoreCase);
             var data = customData ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DownloadManager");
             Directory.CreateDirectory(data); DataDirectory = data;
             if (!args.Args.Contains("--headless") && !args.Args.Contains("--render-ui"))
@@ -43,6 +44,7 @@ public partial class App : Application
                 try { _instanceLock = new FileStream(Path.Combine(data, "instance.lock"), FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None); }
                 catch (IOException)
                 {
+                    if (automaticStartup) { Shutdown(); return; }
                     using var existing = new System.IO.Pipes.NamedPipeClientStream(".", BrowserProtocol.PipeName(data), System.IO.Pipes.PipeDirection.InOut, System.IO.Pipes.PipeOptions.Asynchronous | System.IO.Pipes.PipeOptions.CurrentUserOnly);
                     await existing.ConnectAsync(10000); await BrowserProtocol.WriteAsync(existing, new BrowserRequest { Action = "activate" }); Shutdown(); return;
                 }
@@ -100,7 +102,10 @@ public partial class App : Application
                 await DisposeEngineAsync(); Shutdown(); return;
             }
             if(!Settings.SequentialDefaultsApplied){await Scheduler.SetSequentialDefaultsAsync();Settings.Preferences["parallel"]=1;Settings.SequentialDefaultsApplied=true;Settings.Save(_settingsPath);}
-            main.Show(); _dial=new WindowsDialTransport();var prerequisite=new ConnectionPrerequisite(_dial);Engine.BeforeTransfer=token=>prerequisite.EnsureAsync(Settings.DialPolicy(),token);Scheduler.Start(); _desktop=new DesktopIntegration(this,main);
+            DesktopIntegration.MigrateStartupCommand();
+            _desktop=new DesktopIntegration(this,main);
+            StartupLaunch.Present(main,automaticStartup,()=>_desktop.HideMain());
+            _dial=new WindowsDialTransport();var prerequisite=new ConnectionPrerequisite(_dial);Engine.BeforeTransfer=token=>prerequisite.EnsureAsync(Settings.DialPolicy(),token);Scheduler.Start();
             _browser = new BrowserPipeServer(data, (request, token) => Dispatcher.InvokeAsync(() => main.HandleBrowserAsync(request,token)).Task.Unwrap().WaitAsync(token)); _browser.Start();
         }
         catch (Exception exception)

@@ -45,6 +45,13 @@ internal static class Program
 
         try
         {
+            const string startupExe = @"C:\Program Files\AAA Download Manager\DownloadManager.exe";
+            Check(StartupLaunch.Command(startupExe)=="\""+startupExe+"\" --startup","startup_command_not_quoted_or_marked");
+            Check(StartupLaunch.OwnsCommand("\""+startupExe+"\"",startupExe)&&StartupLaunch.OwnsCommand(StartupLaunch.Command(startupExe),startupExe),"startup_upgrade_ownership");
+            Check(!StartupLaunch.OwnsCommand(StartupLaunch.Command(@"C:\Other\DownloadManager.exe"),startupExe)&&!StartupLaunch.OwnsCommand(null,startupExe),"startup_foreign_command_owned");
+            var hiddenStartup=new Window();var trayCalls=0;StartupLaunch.Present(hiddenStartup,true,()=>{trayCalls++;return true;});Check(!hiddenStartup.IsVisible&&trayCalls==1,"startup_window_visible_with_tray");hiddenStartup.Close();
+            var fallbackStartup=new Window();StartupLaunch.Present(fallbackStartup,true,()=>false);Check(fallbackStartup.WindowState==WindowState.Minimized&&!fallbackStartup.ShowActivated,"startup_fallback_not_minimized");fallbackStartup.Close();
+            var manualStartup=new Window();StartupLaunch.Present(manualStartup,false,()=>throw new Exception("manual_launch_used_tray"));Check(manualStartup.IsVisible&&manualStartup.WindowState==WindowState.Normal,"manual_launch_hidden");manualStartup.Close();
             var catalog = new LocaleCatalog(Path.Combine(AppContext.BaseDirectory, "locales"));
             foreach(var language in new[]{"en","fa"})foreach(var mode in new[]{"light","dark"}){
                 catalog.Select(language);new UserSettings{Palette="classic",Appearance=mode}.ApplyTheme();

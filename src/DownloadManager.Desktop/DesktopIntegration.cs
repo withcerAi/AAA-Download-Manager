@@ -94,8 +94,19 @@ public sealed class DesktopIntegration : IDisposable, IDownloadTraySink
     public static void ConfigureStartup(bool enabled)
     {
         using var key=Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run");
-        if(enabled)key.SetValue("DownloadManager","\""+Environment.ProcessPath+"\"");
-        else if(key.GetValue("DownloadManager") is string existing && existing.Equals("\""+Environment.ProcessPath+"\"",StringComparison.OrdinalIgnoreCase))key.DeleteValue("DownloadManager",false);
+        if(enabled)key.SetValue("DownloadManager",StartupLaunch.Command(Environment.ProcessPath!));
+        else if(StartupLaunch.OwnsCommand(key.GetValue("DownloadManager") as string,Environment.ProcessPath!))key.DeleteValue("DownloadManager",false);
+    }
+    public static void MigrateStartupCommand()
+    {
+        try
+        {
+            using var key=Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run",true);
+            if(key?.GetValue("DownloadManager") is string existing && StartupLaunch.OwnsCommand(existing,Environment.ProcessPath!) && !existing.Equals(StartupLaunch.Command(Environment.ProcessPath!),StringComparison.OrdinalIgnoreCase))
+                key.SetValue("DownloadManager",StartupLaunch.Command(Environment.ProcessPath!));
+        }
+        catch(Exception error) when(error is UnauthorizedAccessException or System.Security.SecurityException or IOException)
+        { Debug.WriteLine(error.GetType().Name); }
     }
     public void Update()
     {

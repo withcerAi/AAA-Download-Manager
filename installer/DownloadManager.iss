@@ -1,16 +1,16 @@
-#define AppVersion "0.5.5"
+#define AppVersion "0.5.6"
 #ifndef SetupAppId
 #define SetupAppId "167AB087-C613-423C-9984-84448870E972"
 #endif
 #ifndef SetupFileName
-#define SetupFileName "AAA-Download-Manager-0.5.5-Setup-x64"
+#define SetupFileName "AAA-Download-Manager-0.5.6-Setup-x64"
 #endif
 [Setup]
 AppId={{{#SetupAppId}}
 AppName=AAA Download Manager
 AppVersion={#AppVersion}
-AppVerName=AAA Download Manager 0.5.5 Preview
-VersionInfoVersion=0.5.5.0
+AppVerName=AAA Download Manager 0.5.6 Preview
+VersionInfoVersion=0.5.6.0
 VersionInfoDescription=AAA Download Manager Setup
 DefaultDirName={localappdata}\Programs\DownloadManager
 DefaultGroupName=AAA Download Manager
@@ -41,7 +41,7 @@ CloseApplications=yes
 CloseApplicationsFilter=DownloadManager.exe,DownloadManager.BrowserHost.exe
 RestartApplications=no
 SetupLogging=yes
-UninstallDisplayName=AAA Download Manager 0.5.5 Preview
+UninstallDisplayName=AAA Download Manager 0.5.6 Preview
 LicenseFile=..\legal\TERMS-OF-USE.txt
 InfoBeforeFile=preview-notes.en.txt
 AllowNoIcons=yes
@@ -67,11 +67,11 @@ Name: "desktopicon"; Description: "{cm:DesktopShortcut}"; GroupDescription: "{cm
 Name: "browserbridge"; Description: "{cm:BrowserBridge}"; GroupDescription: "{cm:BrowserIntegration}"
 
 [Files]
-Source: "..\release\DownloadManager-0.5.5-preview\*"; DestDir: "{app}"; Excludes: "*.pdb"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\release\DownloadManager-0.5.6-preview\*"; DestDir: "{app}"; Excludes: "*.pdb"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "preview-notes.en.txt"; DestDir: "{app}"; DestName: "Preview-Readme.txt"; Flags: ignoreversion
 Source: "preview-notes.fa.txt"; DestDir: "{app}"; DestName: "Preview-Readme.fa.txt"; Flags: ignoreversion
 
-Source: "CHANGES-0.5.5.fa.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "CHANGES-0.5.6.fa.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "Chrome-Extension.fa.txt"; DestDir: "{app}"; Flags: ignoreversion
 
 [InstallDelete]
@@ -123,11 +123,26 @@ begin
   end;
 end;
 
+procedure CurStepChanged(CurStep: TSetupStep);
+var Existing, Command: String;
+begin
+#ifndef IsolatedTest
+  if CurStep = ssPostInstall then
+  begin
+    Command := '"' + ExpandConstant('{app}\DownloadManager.exe') + '"';
+    if RegQueryStringValue(HKCU, 'Software\Microsoft\Windows\CurrentVersion\Run', 'DownloadManager', Existing) then
+      if CompareText(Existing, Command) = 0 then
+        RegWriteStringValue(HKCU, 'Software\Microsoft\Windows\CurrentVersion\Run', 'DownloadManager', Command + ' --startup');
+  end;
+#endif
+end;
+
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 var Existing: String;
 begin
   if CurUninstallStep = usUninstall then
     if RegQueryStringValue(HKCU, 'Software\Microsoft\Windows\CurrentVersion\Run', 'DownloadManager', Existing) then
-      if CompareText(Existing, '"' + ExpandConstant('{app}\DownloadManager.exe') + '"') = 0 then
+      if (CompareText(Existing, '"' + ExpandConstant('{app}\DownloadManager.exe') + '"') = 0) or
+         (CompareText(Existing, '"' + ExpandConstant('{app}\DownloadManager.exe') + '" --startup') = 0) then
         RegDeleteValue(HKCU, 'Software\Microsoft\Windows\CurrentVersion\Run', 'DownloadManager');
 end;
