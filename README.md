@@ -12,7 +12,11 @@ A native Windows download manager built with C# / .NET 10 and WPF. The interface
 
 ## Downloads and installation
 
-The Windows x64 installer is named `AAA-Download-Manager-0.5.5-Setup-x64.exe`. Installers and build outputs are not stored in the source repository. Published packages belong on the repository's Releases page; no public binary release is implied by this source import. Full packages include the .NET runtime, media tools and browser extension files. Users do not need a separate .NET, Python, Node.js or WebView2 installation. Review and accept the English terms on the installer license page. To install unattended after reviewing and authorizing the terms, supply `/ACCEPTTERMS=1`; silent installation without that argument is rejected.
+**[Download the Windows x64 installer — 0.5.5 Preview](https://github.com/withcerAi/AAA-Download-Manager/releases/download/v0.5.5-preview/AAA-Download-Manager-0.5.5-Setup-x64.exe)** · [Release notes and SHA-256 checksum](https://github.com/withcerAi/AAA-Download-Manager/releases/tag/v0.5.5-preview)
+
+This preview installer uses a personal **self-signed** certificate. It is not CA-trusted and Windows may still show publisher or SmartScreen warnings. See the [code signing policy](CODE_SIGNING.md).
+
+The Windows x64 installer is named `AAA-Download-Manager-0.5.5-Setup-x64.exe`. Installers are distributed through GitHub Releases and are not stored in Git source history. This full package includes the .NET runtime, media tools and browser extension files. Users do not need a separate .NET, Python, Node.js or WebView2 installation. Review and accept the English terms on the installer license page. To install unattended after reviewing and authorizing the terms, supply `/ACCEPTTERMS=1`; silent installation without that argument is rejected.
 
 The package remains a preview. Server, browser and operating-system support determine which operations are available. No download speed, file authenticity, safe content or successful recovery is guaranteed.
 
