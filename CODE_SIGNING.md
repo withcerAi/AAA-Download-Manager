@@ -2,10 +2,11 @@
 
 ## Current status
 
-The project is preparing for open-source code signing. No certificate, signing
-service approval, or signed release is claimed. Existing preview installers are
-unsigned unless a release explicitly states otherwise and Windows verifies the
-signature.
+The project has no publicly trusted code-signing certificate or signing service
+approval. Preview packages may be unsigned or explicitly marked self-signed in
+their release notes. A self-signed signature does not establish a trusted publisher
+on other computers and may still produce Windows security warnings. It must never
+be described as CA-trusted signing. Private signing keys are not published.
 
 ## Responsibilities
 
