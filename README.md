@@ -12,11 +12,11 @@ A native Windows download manager built with C# / .NET 10 and WPF. The interface
 
 ## Downloads and installation
 
-**[Download the Windows x64 installer — 0.5.7 Preview](https://github.com/withcerAi/AAA-Download-Manager/releases/download/v0.5.7-preview/AAA-Download-Manager-0.5.7-Setup-x64.exe)** · [Release notes and SHA-256 checksum](https://github.com/withcerAi/AAA-Download-Manager/releases/tag/v0.5.7-preview)
+**[Download the Windows x64 installer — 0.5.8 Preview](https://github.com/withcerAi/AAA-Download-Manager/releases/download/v0.5.8-preview/AAA-Download-Manager-0.5.8-Setup-x64.exe)** · [Release notes and SHA-256 checksum](https://github.com/withcerAi/AAA-Download-Manager/releases/tag/v0.5.8-preview)
 
 This preview installer uses a personal **self-signed** certificate. It is not CA-trusted and Windows may still show publisher or SmartScreen warnings. See the [code signing policy](CODE_SIGNING.md).
 
-The Windows x64 installer is named `AAA-Download-Manager-0.5.7-Setup-x64.exe`. Installers are distributed through GitHub Releases and are not stored in Git source history. This full package includes the .NET runtime, media tools and browser extension files. Users do not need a separate .NET, Python, Node.js or WebView2 installation. Review and accept the English terms on the installer license page. To install unattended after reviewing and authorizing the terms, supply `/ACCEPTTERMS=1`; silent installation without that argument is rejected.
+The Windows x64 installer is named `AAA-Download-Manager-0.5.8-Setup-x64.exe`. Installers are distributed through GitHub Releases and are not stored in Git source history. This full package includes the .NET runtime, media tools and browser extension files. Users do not need a separate .NET, Python, Node.js or WebView2 installation. Review and accept the English terms on the installer license page. To install unattended after reviewing and authorizing the terms, supply `/ACCEPTTERMS=1`; silent installation without that argument is rejected.
 
 The package remains a preview. Server, browser and operating-system support determine which operations are available. No download speed, file authenticity, safe content or successful recovery is guaranteed.
 
@@ -59,7 +59,7 @@ GitHub Actions builds and tests the project on a GitHub-hosted Windows runner fo
 Use the .NET 10 SDK on Windows:
 
 ```powershell
-dotnet publish src/DownloadManager.Desktop/DownloadManager.Desktop.csproj -c Release -r win-x64 --self-contained true -o release/DownloadManager-0.5.7-preview --configfile NuGet.Config
+dotnet publish src/DownloadManager.Desktop/DownloadManager.Desktop.csproj -c Release -r win-x64 --self-contained true -o release/DownloadManager-0.5.8-preview --configfile NuGet.Config
 ```
 
 `installer/build.ps1` publishes the desktop and native host and compiles the Inno Setup installer. `browser-extension/build.py --version 0.5.3` synchronizes the canonical extension source.
