@@ -18,6 +18,7 @@ public sealed class DownloadRow(DownloadJob job, LocaleCatalog locale) : INotify
     public double Progress => Job.Progress;
     public string ProgressText => Job.Progress.ToString("F1", locale.Culture) + "%";
     public string Added => Job.AddedAt.ToLocalTime().ToString("g", locale.Culture);
+    public DateTimeOffset AddedAt => Job.AddedAt;
     public string Description => Job.ErrorKey is { } error ? locale.S(error == "errors.http" && Job.ErrorDetail == "403" ? "errors.http_forbidden" : error, ("detail", Job.ErrorDetail)) : Job.Description;
     public string Path => Job.FinalPath;
     public void Apply(DownloadJob next) { Job = next; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null)); }

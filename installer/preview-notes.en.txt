@@ -1,4 +1,4 @@
-AAA Download Manager 0.5.7 Preview
+AAA Download Manager 0.5.8 Preview
 
 This preview includes download queues, scheduling, browser integration, metadata previews and batch link checks. Features depend on server, browser and operating-system support.
 

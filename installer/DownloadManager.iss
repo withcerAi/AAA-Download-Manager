@@ -1,16 +1,16 @@
-#define AppVersion "0.5.7"
+#define AppVersion "0.5.8"
 #ifndef SetupAppId
 #define SetupAppId "167AB087-C613-423C-9984-84448870E972"
 #endif
 #ifndef SetupFileName
-#define SetupFileName "AAA-Download-Manager-0.5.7-Setup-x64"
+#define SetupFileName "AAA-Download-Manager-0.5.8-Setup-x64"
 #endif
 [Setup]
 AppId={{{#SetupAppId}}
 AppName=AAA Download Manager
 AppVersion={#AppVersion}
-AppVerName=AAA Download Manager 0.5.7 Preview
-VersionInfoVersion=0.5.7.0
+AppVerName=AAA Download Manager 0.5.8 Preview
+VersionInfoVersion=0.5.8.0
 VersionInfoDescription=AAA Download Manager Setup
 DefaultDirName={localappdata}\Programs\DownloadManager
 DefaultGroupName=AAA Download Manager
@@ -41,7 +41,7 @@ CloseApplications=yes
 CloseApplicationsFilter=DownloadManager.exe,DownloadManager.BrowserHost.exe
 RestartApplications=no
 SetupLogging=yes
-UninstallDisplayName=AAA Download Manager 0.5.7 Preview
+UninstallDisplayName=AAA Download Manager 0.5.8 Preview
 LicenseFile=..\legal\TERMS-OF-USE.txt
 InfoBeforeFile=preview-notes.en.txt
 AllowNoIcons=yes
@@ -67,11 +67,11 @@ Name: "desktopicon"; Description: "{cm:DesktopShortcut}"; GroupDescription: "{cm
 Name: "browserbridge"; Description: "{cm:BrowserBridge}"; GroupDescription: "{cm:BrowserIntegration}"
 
 [Files]
-Source: "..\release\DownloadManager-0.5.7-preview\*"; DestDir: "{app}"; Excludes: "*.pdb"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\release\DownloadManager-0.5.8-preview\*"; DestDir: "{app}"; Excludes: "*.pdb"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "preview-notes.en.txt"; DestDir: "{app}"; DestName: "Preview-Readme.txt"; Flags: ignoreversion
 Source: "preview-notes.fa.txt"; DestDir: "{app}"; DestName: "Preview-Readme.fa.txt"; Flags: ignoreversion
 
-Source: "CHANGES-0.5.7.fa.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "CHANGES-0.5.8.fa.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "Chrome-Extension.fa.txt"; DestDir: "{app}"; Flags: ignoreversion
 
 [InstallDelete]

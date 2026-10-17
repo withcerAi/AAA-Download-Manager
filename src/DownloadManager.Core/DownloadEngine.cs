@@ -46,9 +46,13 @@ public sealed partial class DownloadEngine : IAsyncDisposable
         }) { Timeout = Timeout.InfiniteTimeSpan };
         if (File.Exists(_storePath))
         {
-            var jobs = JsonSerializer.Deserialize<List<DownloadJob>>(File.ReadAllText(_storePath), JsonOptions) ?? [];
+            using var stored=JsonDocument.Parse(File.ReadAllText(_storePath));
+            var jobs = stored.RootElement.Deserialize<List<DownloadJob>>(JsonOptions) ?? [];
+            // Older versions did not store pause intent. Preserve their paused entries on upgrade.
+            var legacyPaused=stored.RootElement.EnumerateArray().Where(item=>!item.TryGetProperty(nameof(DownloadJob.ManuallyPaused),out _)&&item.TryGetProperty(nameof(DownloadJob.State),out var state)&&state.GetInt32()==(int)DownloadState.Paused).Select(item=>item.GetProperty(nameof(DownloadJob.Id)).GetString()).ToHashSet();
             foreach (var job in jobs)
             {
+                if(legacyPaused.Contains(job.Id))job.ManuallyPaused=true;
                 if (job.State == DownloadState.Running) job.State = DownloadState.Paused;
                 job.BytesPerSecond = 0;
                 job.ActiveConnections = 0;
@@ -170,6 +174,7 @@ public sealed partial class DownloadEngine : IAsyncDisposable
             entry.Job.PhaseKey = "native.connecting"; entry.Job.RetryNumber = 0;
             entry.Estimate.Reset(); entry.Job.EstimatedSecondsRemaining=null;
             entry.Job.State = DownloadState.Running;
+            entry.Job.ManuallyPaused = false;
             entry.Job.ErrorKey = null;
             entry.Job.ErrorDetail = null;
             SaveLocked();
@@ -178,7 +183,7 @@ public sealed partial class DownloadEngine : IAsyncDisposable
         finally { _gate.Release(); }
     }
 
-    public async Task PauseAsync(string id)
+    public async Task PauseAsync(string id, bool manual = false)
     {
         Task? worker;
         await _gate.WaitAsync().ConfigureAwait(false);
@@ -186,6 +191,7 @@ public sealed partial class DownloadEngine : IAsyncDisposable
         {
             var entry = _entries[id];
             worker = entry.Worker;
+            if(manual && entry.Job.State!=DownloadState.Completed){entry.Job.ManuallyPaused=true;SaveLocked();}
             entry.Cancellation?.Cancel();
             if (worker is null || worker.IsCompleted)
             {
@@ -237,7 +243,7 @@ public sealed partial class DownloadEngine : IAsyncDisposable
     }
     public async Task MarkQueuedAsync(string id)
     {
-        await _gate.WaitAsync();try{var job=_entries[id].Job;if(job.State is not(DownloadState.Running or DownloadState.Completed)){job.InQueue=true;job.State=DownloadState.Queued;job.PhaseKey="ui.queued";job.ErrorKey=null;job.ErrorDetail=null;SaveLocked();}}finally{_gate.Release();}
+        await _gate.WaitAsync();try{var job=_entries[id].Job;if(job.State is not(DownloadState.Running or DownloadState.Completed)){job.ManuallyPaused=false;job.InQueue=true;job.State=DownloadState.Queued;job.PhaseKey="ui.queued";job.ErrorKey=null;job.ErrorDetail=null;SaveLocked();}}finally{_gate.Release();}
     }
 
     public async Task<IReadOnlyList<DownloadJob>> SnapshotAsync()

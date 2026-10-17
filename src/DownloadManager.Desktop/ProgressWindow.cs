@@ -21,6 +21,7 @@ public sealed class ProgressWindow : Window
 {
     private readonly DownloadEngine _engine;
     private readonly Func<string,Task>? _resume;
+    private readonly Func<string,Task>? _pauseJob;
     private readonly LocaleCatalog _locale;
     private readonly string _id;
     private readonly DispatcherTimer _timer = new() { Interval = TimeSpan.FromMilliseconds(350) };
@@ -65,10 +66,10 @@ public sealed class ProgressWindow : Window
     private DateTimeOffset _lastSample = DateTimeOffset.MinValue;
     private DownloadJob? _job;
 
-    public ProgressWindow(DownloadEngine engine, LocaleCatalog locale, string id, ProgressViewOptions? viewOptions = null, Func<string,Task>? resume = null)
+    public ProgressWindow(DownloadEngine engine, LocaleCatalog locale, string id, ProgressViewOptions? viewOptions = null, Func<string,Task>? resume = null, Func<string,Task>? pause = null)
     {
         viewOptions ??= new ProgressViewOptions();
-        _engine = engine; _locale = locale; _id = id; _resume=resume;
+        _engine = engine; _locale = locale; _id = id; _resume=resume; _pauseJob=pause;
         Width = 690; Height = Math.Min(480, SystemParameters.WorkArea.Height - 40); MinWidth = 620; MinHeight = 420; WindowStartupLocation = WindowStartupLocation.CenterOwner; FlowDirection = locale.Direction;
         System.Windows.Data.BindingOperations.SetBinding(this, FlowDirectionProperty, new System.Windows.Data.Binding(nameof(LocaleCatalog.Direction)) { Source = locale });
         TaskbarItemInfo = new TaskbarItemInfo();
@@ -76,7 +77,7 @@ public sealed class ProgressWindow : Window
         var footer = new DockPanel { Margin = new Thickness(0, 12, 0, 0) }; var actions = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
         _hideClose = Ui.Button(locale, "native.hide_window", async (_, _) => await HideToTrayAsync());
         _pause = Ui.Button(locale, "ui.pause", async (_, _) => await TogglePauseAsync()); _pause.SetResourceReference(BackgroundProperty, "Selection"); _pause.SetResourceReference(BorderBrushProperty, "Accent");
-        _stopClose = Ui.Button(locale, "native.stop_and_close", async (_, _) => { try { if (_job?.State != DownloadState.Completed) { await engine.PauseAsync(id); await engine.SetQueueAsync(id, false); } Close(); } catch (Exception error) { ShowError(error); } });
+        _stopClose = Ui.Button(locale, "native.stop_and_close", async (_, _) => { try { if (_job?.State != DownloadState.Completed) { await PauseTransferAsync(); await engine.SetQueueAsync(id, false); } Close(); } catch (Exception error) { ShowError(error); } });
         actions.Children.Add(_hideClose); actions.Children.Add(_pause); actions.Children.Add(_stopClose); DockPanel.SetDock(actions, Dock.Right); footer.Children.Add(actions);
         _detailButton = Ui.Button(locale, "native.show_details", (_, _) => ToggleDetails()); _detailButton.HorizontalAlignment = HorizontalAlignment.Left; _detailButton.Visibility = viewOptions.ShowDetailsButton ? Visibility.Visible : Visibility.Collapsed; footer.Children.Add(_detailButton); DockPanel.SetDock(footer, Dock.Bottom); layout.Children.Add(footer);
         var top = new DockPanel { Margin = new Thickness(0, 0, 0, 14) }; var icon = DesktopIcons.Create("document", 32); icon.Margin = new Thickness(0, 2, 13, 0); DockPanel.SetDock(icon, Dock.Left); top.Children.Add(icon); var title = new StackPanel(); title.Children.Add(_name); _source.Margin = new Thickness(0, 5, 0, 0); _source.SetResourceReference(TextBlock.ForegroundProperty, "MutedInk"); title.Children.Add(_source); top.Children.Add(title); DockPanel.SetDock(top, Dock.Top); layout.Children.Add(top);
@@ -150,7 +151,8 @@ public sealed class ProgressWindow : Window
         catch (Exception error) { _limitStatus.Text = _locale.S(error is ArgumentException or OverflowException ? "errors.invalid_speed_limit" : "errors.operation", ("detail", error.GetType().Name)); }
     }
     private async Task SaveCompletionAsync() { if (_synchronizing || !_initialized) return; try { await _engine.SetCompletionOptionsAsync(_id, _showSummary.IsChecked == true, _closeWhenDone.IsChecked == true); await RefreshForRenderAsync(); } catch (Exception error) { ShowError(error); } }
-    private async Task TogglePauseAsync() { try { if (_job is null) return; if (_job.State == DownloadState.Running) await _engine.PauseAsync(_id); else if(_resume is not null)await _resume(_id);else await _engine.StartAsync(_id); await RefreshForRenderAsync(); } catch (Exception error) { ShowError(error); } }
+    private Task PauseTransferAsync()=>_pauseJob is not null?_pauseJob(_id):_engine.PauseAsync(_id,manual:true);
+    private async Task TogglePauseAsync() { try { if (_job is null) return; if (_job.State == DownloadState.Running) await PauseTransferAsync(); else if(_resume is not null)await _resume(_id);else await _engine.StartAsync(_id); await RefreshForRenderAsync(); } catch (Exception error) { ShowError(error); } }
     private void ShowError(Exception error) => _error.Text = _locale.S("errors.operation", ("detail", error.GetType().Name));
     private void OpenFolder() {if(_job is {} job)DownloadFileActions.Open(this,_locale,job,true); }
     internal void SetCapturedSamples(IEnumerable<double> samples) { _capturedSamples = true; foreach (var sample in samples) _chart.AddSample(sample); }

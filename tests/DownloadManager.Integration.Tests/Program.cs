@@ -241,6 +241,27 @@ try
   var active=await removal.AddAsync(server.Url("range"),folder,"active.bin");await Until(async()=>File.Exists(active.PartialPath));await removal.RemoveAsync(active.Id,true);Check(!File.Exists(active.PartialPath)&&!(await removal.SnapshotAsync()).Any(j=>j.Id==active.Id),"running_delete_not_stopped");
  }
 
+ var manualRoot=Path.Combine(root,"manual-pause-restart");string manualId;long manualBytes;
+ await using(var manualEngine=new DownloadEngine(manualRoot)){
+  manualEngine.Configure(new(){MaxConnections=1,RetryCount=0});await using var manualQueue=new QueueScheduler(manualEngine,manualRoot);
+  var manualFirst=await manualEngine.AddAsync(server.Url("range"),Path.Combine(manualRoot,"files"),"manualFirst.bin",false);var manualSecond=await manualEngine.AddAsync(server.Url("range"),Path.Combine(manualRoot,"files"),"manualSecond.bin",false);
+  await manualQueue.AssignAsync([manualFirst.Id,manualSecond.Id],"main");await manualQueue.ResumeSelectedAsync([manualFirst.Id,manualSecond.Id]);await Until(async()=>(await manualEngine.SnapshotAsync()).Single(j=>j.Id==manualFirst.Id).ReceivedBytes>=65536);
+  await manualQueue.PauseSelectedAsync([manualFirst.Id]);var paused=(await manualEngine.SnapshotAsync()).Single(j=>j.Id==manualFirst.Id);Check(paused.State==DownloadState.Paused&&paused.ManuallyPaused,"manual_pause_intent_missing");manualId=manualFirst.Id;manualBytes=paused.ReceivedBytes;
+  await manualQueue.TickAsync(DateTimeOffset.UtcNow);Check((await manualEngine.SnapshotAsync()).Single(j=>j.Id==manualSecond.Id).State is DownloadState.Running or DownloadState.Completed,"manual_pause_blocks_next_file");
+ }
+ await using(var recoveredEngine=new DownloadEngine(manualRoot)){
+  recoveredEngine.Configure(new(){MaxConnections=1,RetryCount=0});await using var recoveredQueue=new QueueScheduler(recoveredEngine,manualRoot);await recoveredQueue.TickAsync(DateTimeOffset.UtcNow);
+  var paused=(await recoveredEngine.SnapshotAsync()).Single(j=>j.Id==manualId);Check(paused.State==DownloadState.Paused&&paused.ManuallyPaused&&paused.ReceivedBytes==manualBytes,"manual_pause_resumed_on_restart");
+  await recoveredQueue.ResumeSelectedAsync([manualId]);Check(!(await recoveredEngine.SnapshotAsync()).Single(j=>j.Id==manualId).ManuallyPaused,"explicit_resume_kept_manual_pause");
+  await Until(async()=>{await recoveredQueue.TickAsync(DateTimeOffset.UtcNow);var snapshot=await recoveredEngine.SnapshotAsync();Check(snapshot.Count(j=>j.State==DownloadState.Running)<=1,"manual_resume_exceeds_parallel_limit");return snapshot.All(j=>j.State==DownloadState.Completed);});
+  foreach(var item in await recoveredEngine.SnapshotAsync())Check(SHA256.HashData(await File.ReadAllBytesAsync(item.FinalPath)).SequenceEqual(SHA256.HashData(server.CurrentData)),"manual_resume_hash_mismatch");
+  var scheduledPaused=await recoveredEngine.AddAsync(server.Url("range"),Path.Combine(manualRoot,"files"),"scheduled-paused.bin",false);await recoveredQueue.AssignAsync([scheduledPaused.Id],"main");await recoveredQueue.PauseSelectedAsync([scheduledPaused.Id]);
+  var scheduledQueue=(await recoveredQueue.SnapshotAsync()).Single();var currentTime=DateTimeOffset.UtcNow;scheduledQueue.Schedule=new(){Enabled=true,Kind=ScheduleKind.Once,FirstDate=DateOnly.FromDateTime(currentTime.UtcDateTime),StartTime=TimeOnly.MinValue,DurationMinutes=1440,TimeZoneId="UTC",CatchUp=true};await recoveredQueue.SaveQueueAsync(scheduledQueue);await recoveredQueue.TickAsync(currentTime);
+  Check((await recoveredEngine.SnapshotAsync()).Single(j=>j.Id==scheduledPaused.Id).State==DownloadState.Paused,"schedule_overrode_manual_pause");await recoveredQueue.StartAsync("main");Check(!(await recoveredEngine.SnapshotAsync()).Single(j=>j.Id==scheduledPaused.Id).ManuallyPaused,"explicit_queue_start_did_not_release_pause");await recoveredQueue.PauseSelectedAsync([scheduledPaused.Id]);
+ }
+ var oldPauseRoot=Path.Combine(root,"legacy-manual-pause");Directory.CreateDirectory(oldPauseRoot);var oldPauseJob=new DownloadJob{Id="legacy-paused-job",Url=server.Url("range"),FileName="legacy-paused.bin",Directory=Path.Combine(oldPauseRoot,"files"),FinalPath=Path.Combine(oldPauseRoot,"files","legacy-paused.bin"),PartialPath=Path.Combine(oldPauseRoot,"temporary",".dm-legacy-paused-job.part"),State=DownloadState.Paused,InQueue=true};
+ var oldPauseDocument=JsonSerializer.SerializeToNode(new[]{oldPauseJob})!.AsArray();oldPauseDocument[0]!.AsObject().Remove(nameof(DownloadJob.ManuallyPaused));await File.WriteAllTextAsync(Path.Combine(oldPauseRoot,"downloads.json"),oldPauseDocument.ToJsonString());await File.WriteAllTextAsync(Path.Combine(oldPauseRoot,"queues.json"),JsonSerializer.Serialize(new QueueStore{Queues=[new(){Id="main",IsRunning=true,JobIds=[oldPauseJob.Id],Owned=[oldPauseJob.Id]}]}));
+ await using(var oldPauseEngine=new DownloadEngine(oldPauseRoot)){await using var oldPauseQueue=new QueueScheduler(oldPauseEngine,oldPauseRoot);await oldPauseQueue.TickAsync(DateTimeOffset.UtcNow);var keptPaused=(await oldPauseEngine.SnapshotAsync()).Single();Check(keptPaused.ManuallyPaused&&keptPaused.State==DownloadState.Paused,"legacy_paused_download_resumed_on_upgrade");}
  var sequentialRoot=Path.Combine(root,"sequential-ten");server.ResizeData(262144);
  await using(var sequentialEngine=new DownloadEngine(sequentialRoot)){
   sequentialEngine.Configure(new(){MaxConnections=1,RetryCount=0});await using var sequential=new QueueScheduler(sequentialEngine,sequentialRoot);

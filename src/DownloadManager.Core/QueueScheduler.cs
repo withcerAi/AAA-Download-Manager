@@ -157,11 +157,33 @@ public sealed class QueueScheduler : IAsyncDisposable
     }
     public async Task StartAsync(string queueId, DateTimeOffset? now = null)
     {
-        await _gate.WaitAsync(); try { var queue=Find(queueId);if(queue.IsRunning)queue.RunScope=null;else Begin(queue,null,null); Save(); } finally { _gate.Release(); } await TickAsync(now ?? DateTimeOffset.UtcNow);
+        await _gate.WaitAsync(); try { var queue=Find(queueId);await ReleaseManualPausesLocked(queue,queue.JobIds);if(queue.IsRunning)queue.RunScope=null;else Begin(queue,null,null); Save(); } finally { _gate.Release(); } await TickAsync(now ?? DateTimeOffset.UtcNow);
     }
     public async Task StartSelectedAsync(string queueId,IEnumerable<string> ids)
     {
-        await _gate.WaitAsync();try{var queue=Find(queueId);var scope=ids.Where(queue.JobIds.Contains).ToHashSet();if(!queue.IsRunning){Begin(queue,null,null);queue.RunScope=scope;}else queue.RunScope?.UnionWith(scope);Save();}finally{_gate.Release();}await TickAsync(DateTimeOffset.UtcNow);
+        await _gate.WaitAsync();try{var queue=Find(queueId);var scope=ids.Where(queue.JobIds.Contains).ToHashSet();await ReleaseManualPausesLocked(queue,scope);if(!queue.IsRunning){Begin(queue,null,null);queue.RunScope=scope;}else queue.RunScope?.UnionWith(scope);Save();}finally{_gate.Release();}await TickAsync(DateTimeOffset.UtcNow);
+    }
+    private async Task ReleaseManualPausesLocked(DownloadQueue queue,IEnumerable<string> ids)
+    {
+        var selected=ids.ToHashSet();
+        foreach(var job in (await _engine.SnapshotAsync()).Where(job=>selected.Contains(job.Id)&&job.ManuallyPaused&&job.State!=DownloadState.Completed))
+        {await _engine.MarkQueuedAsync(job.Id);queue.Attempted.Remove(job.Id);queue.FailedProbes.Remove(job.Id);queue.Attempts.Remove(job.Id);queue.RetryAt.Remove(job.Id);queue.Owned.Remove(job.Id);}
+    }
+    public async Task PauseSelectedAsync(IEnumerable<string> ids)
+    {
+        await _gate.WaitAsync();
+        try
+        {
+            var jobs=(await _engine.SnapshotAsync()).ToDictionary(job=>job.Id);
+            foreach(var id in ids.Distinct().Where(id=>jobs.TryGetValue(id,out var job)&&job.State!=DownloadState.Completed))
+            {
+                await _engine.PauseAsync(id,manual:true);
+                foreach(var queue in _store.Queues.Where(queue=>queue.JobIds.Contains(id)))
+                {queue.Owned.Remove(id);queue.Attempted.Add(id);queue.RetryAt.Remove(id);queue.FailedProbes.Remove(id);}
+            }
+            Save();
+        }
+        finally{_gate.Release();}
     }
     public async Task ResumeSelectedAsync(IEnumerable<string> ids)
     {
@@ -222,7 +244,7 @@ public sealed class QueueScheduler : IAsyncDisposable
                     if (queue.Schedule.CatchUp || now - current.Start <= TimeSpan.FromSeconds(65)) Begin(queue, current.Key, queue.Schedule.StopAtEnd ? current.End : null);
                     else Event(queue.Id, "scheduler.missed");
                 }
-                if (queue.IsRunning) foreach (var id in queue.JobIds.Where(id => (queue.RunScope is null || queue.RunScope.Contains(id)) && jobs.TryGetValue(id,out var job) && job.State == DownloadState.Failed && queue.Attempted.Contains(id)).ToArray())
+                if (queue.IsRunning) foreach (var id in queue.JobIds.Where(id => (queue.RunScope is null || queue.RunScope.Contains(id)) && jobs.TryGetValue(id,out var job) && !job.ManuallyPaused && job.State == DownloadState.Failed && queue.Attempted.Contains(id)).ToArray())
                 {
                     if (queue.Attempts.GetValueOrDefault(id) <= queue.RetryLimit && !queue.RetryAt.ContainsKey(id)) { queue.RetryAt[id]=now.AddSeconds(queue.RetryDelaySeconds); Event(queue.Id,"scheduler.retry_wait",id); }
                     if (queue.RetryAt.TryGetValue(id,out var retry) && now>=retry) { queue.RetryAt.Remove(id); queue.Attempted.Remove(id); queue.JobIds.Remove(id); queue.JobIds.Add(id); }
@@ -242,7 +264,7 @@ public sealed class QueueScheduler : IAsyncDisposable
                 {
                     if (active >= Math.Clamp(GlobalParallel, 1, 10)) break;
                     if (queue.JobIds.Count(id => jobs.TryGetValue(id, out var item) && item.State == DownloadState.Running) >= queue.Parallel) continue;
-                    var id = queue.JobIds.FirstOrDefault(id => (queue.RunScope is null || queue.RunScope.Contains(id)) && jobs.TryGetValue(id, out var item) && !item.PendingBrowserCommit && item.State != DownloadState.Running && (item.State != DownloadState.Completed || queue.Synchronization) && !queue.Attempted.Contains(id));
+                    var id = queue.JobIds.FirstOrDefault(id => (queue.RunScope is null || queue.RunScope.Contains(id)) && jobs.TryGetValue(id, out var item) && !item.ManuallyPaused && !item.PendingBrowserCommit && item.State != DownloadState.Running && (item.State != DownloadState.Completed || queue.Synchronization) && !queue.Attempted.Contains(id));
                     if (id is null) continue;
                     queue.Attempted.Add(id); queue.Attempts[id]=queue.Attempts.GetValueOrDefault(id)+1; queue.Owned.Add(id); Save();
                     try { var started=true; if(queue.Synchronization && jobs[id].State==DownloadState.Completed)started=await _engine.SynchronizeAsync(id,_stop.Token);else await _engine.StartAsync(id);
@@ -252,7 +274,7 @@ public sealed class QueueScheduler : IAsyncDisposable
             } while (launched && active < Math.Clamp(GlobalParallel, 1, 10));
             foreach (var queue in _store.Queues.Where(queue => queue.IsRunning))
             {
-                if (queue.RetryAt.Count == 0 && !queue.JobIds.Any(id => (queue.RunScope is null || queue.RunScope.Contains(id)) && jobs.TryGetValue(id, out var item) && item.State == DownloadState.Running) && !queue.JobIds.Any(id => (queue.RunScope is null || queue.RunScope.Contains(id)) && jobs.TryGetValue(id, out var item) && (item.State != DownloadState.Completed || queue.Synchronization) && !queue.Attempted.Contains(id))) { queue.IsRunning = false;
+                if (queue.RetryAt.Count == 0 && !queue.JobIds.Any(id => (queue.RunScope is null || queue.RunScope.Contains(id)) && jobs.TryGetValue(id, out var item) && item.State == DownloadState.Running) && !queue.JobIds.Any(id => (queue.RunScope is null || queue.RunScope.Contains(id)) && jobs.TryGetValue(id, out var item) && !item.ManuallyPaused && (item.State != DownloadState.Completed || queue.Synchronization) && !queue.Attempted.Contains(id))) { queue.IsRunning = false;
                     var allSucceeded = queue.FailedProbes.Count == 0 && queue.Attempted.Count > 0 && queue.Attempted.All(id => jobs.TryGetValue(id, out var job) && job.State == DownloadState.Completed);
                     if(queue.Synchronization){queue.CycleSucceeded=allSucceeded;queue.NextRun=now.AddMinutes(queue.IntervalMinutes);if(queue.RunUntil is { } until && queue.NextRun>until)queue.NextRun=until;}
                     if (allSucceeded && !queue.Synchronization && queue.Completion.Action != CompletionAction.None) _completions.Add(new(Guid.NewGuid().ToString("N"), queue.Id, queue.Completion.Copy()));

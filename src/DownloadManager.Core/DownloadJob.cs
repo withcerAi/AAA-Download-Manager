@@ -45,6 +45,7 @@ public sealed class DownloadJob
     public bool PendingBrowserCommit { get; set; }
     public bool ReplaceExisting { get; set; }
     public bool InQueue { get; set; }
+    public bool ManuallyPaused { get; set; }
     public string PhaseKey { get; set; } = "ui.queued";
     public long TransferredBytes { get; set; }
     public double ActiveSeconds { get; set; }

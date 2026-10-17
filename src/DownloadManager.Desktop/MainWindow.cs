@@ -117,18 +117,21 @@ public sealed class MainWindow : Window
         var fileGlyph = new FrameworkElementFactory(typeof(System.Windows.Shapes.Path)); fileGlyph.SetValue(System.Windows.Shapes.Path.DataProperty, Geometry.Parse("M5,2 L14,2 L20,8 L20,22 L5,22 Z M14,2 L14,8 L20,8")); fileGlyph.SetValue(System.Windows.Shapes.Path.StrokeThicknessProperty, 1.5d); fileGlyph.SetValue(System.Windows.Shapes.Path.StretchProperty, Stretch.Uniform); fileGlyph.SetValue(FrameworkElement.WidthProperty, 14d); fileGlyph.SetValue(FrameworkElement.HeightProperty, 16d); fileGlyph.SetValue(FrameworkElement.MarginProperty, new Thickness(0, 0, 9, 0)); fileGlyph.SetResourceReference(System.Windows.Shapes.Path.StrokeProperty, "Accent"); filePanel.AppendChild(fileGlyph);
         var fileName = new FrameworkElementFactory(typeof(TextBlock)); fileName.SetBinding(TextBlock.TextProperty, new Binding(nameof(DownloadRow.Name))); fileName.SetValue(TextBlock.TextTrimmingProperty, TextTrimming.CharacterEllipsis); filePanel.AppendChild(fileName); fileTemplate.VisualTree = filePanel;
         var nameColumn = new DataGridTemplateColumn { CellTemplate = fileTemplate, Width = 350, MinWidth = 250 }; _locale.Bind(nameColumn, DataGridColumn.HeaderProperty, "ui.file_name"); _headers.Add((nameColumn, "ui.file_name")); _downloads.Columns.Add(nameColumn);
-        Add("ui.queue", nameof(DownloadRow.Queue), 125);
+        Add("ui.date_added", nameof(DownloadRow.Added), 150);
+        _downloads.Columns[1].SortDirection=ListSortDirection.Descending;
+        CollectionViewSource.GetDefaultView(_rows).SortDescriptions.Add(new SortDescription(nameof(DownloadRow.AddedAt),ListSortDirection.Descending));
+        Add("ui.queue", nameof(DownloadRow.Queue), 100);
         Add("ui.size", nameof(DownloadRow.Size), 86);
         Add("ui.status", nameof(DownloadRow.StateText), 112);
         var template = new DataTemplate(); var panel = new FrameworkElementFactory(typeof(StackPanel)); panel.SetValue(StackPanel.OrientationProperty, Orientation.Horizontal);
         var bar = new FrameworkElementFactory(typeof(ProgressBar)); bar.SetValue(ProgressBar.WidthProperty, 70d); bar.SetValue(ProgressBar.HeightProperty, 6d); bar.SetValue(ProgressBar.MarginProperty, new Thickness(3, 0, 7, 0)); bar.SetBinding(ProgressBar.ValueProperty, new Binding(nameof(DownloadRow.Progress)) { Mode = BindingMode.OneWay }); panel.AppendChild(bar);
         var label = new FrameworkElementFactory(typeof(TextBlock)); label.SetValue(TextBlock.VerticalAlignmentProperty, VerticalAlignment.Center); label.SetBinding(TextBlock.TextProperty, new Binding(nameof(DownloadRow.ProgressText))); panel.AppendChild(label); template.VisualTree = panel;
         var progress = new DataGridTemplateColumn { CellTemplate = template, Width = 128 }; _locale.Bind(progress, DataGridColumn.HeaderProperty, "ui.progress"); _headers.Add((progress, "ui.progress")); _downloads.Columns.Add(progress);
-        Add("ui.transfer_rate", nameof(DownloadRow.Speed), 98); Add("ui.time_left", nameof(DownloadRow.TimeLeft), 100); Add("ui.date_added", nameof(DownloadRow.Added), 140); Add("ui.description", nameof(DownloadRow.Description), 220); Add("ui.save_to", nameof(DownloadRow.Path), 400, true);
-        foreach (var column in _downloads.Columns.Skip(7)) column.Visibility = Visibility.Collapsed;
+        Add("ui.transfer_rate", nameof(DownloadRow.Speed), 98); Add("ui.time_left", nameof(DownloadRow.TimeLeft), 90); Add("ui.description", nameof(DownloadRow.Description), 220); Add("ui.save_to", nameof(DownloadRow.Path), 400, true);
+        foreach (var column in _downloads.Columns.Skip(8)) column.Visibility = Visibility.Collapsed;
         void Add(string key, string path, double width, bool leftToRight = false)
         {
-            var column = new DataGridTextColumn { Binding = new Binding(path), Width = width };
+            var column = new DataGridTextColumn { Binding = new Binding(path), Width = width, SortMemberPath=path==nameof(DownloadRow.Added)?nameof(DownloadRow.AddedAt):path };
             var style = new Style(typeof(TextBlock)); style.Setters.Add(new Setter(ToolTipProperty, new Binding(nameof(DownloadRow.Description)))); style.Setters.Add(new Setter(TextBlock.TextTrimmingProperty, TextTrimming.CharacterEllipsis)); style.Setters.Add(new Setter(TextBlock.VerticalAlignmentProperty, VerticalAlignment.Center)); if (leftToRight) style.Setters.Add(new Setter(FlowDirectionProperty, FlowDirection.LeftToRight)); column.ElementStyle = style;
             _locale.Bind(column, DataGridColumn.HeaderProperty, key); _headers.Add((column, key)); _downloads.Columns.Add(column);
         }
@@ -261,8 +264,8 @@ public sealed class MainWindow : Window
                     break;
                 case "copyLinks": if (selection.Length > 0) Clipboard.SetText(string.Join(Environment.NewLine, selection.Select(row => row.Job.Url))); break;
                 case "resume": await _app.Scheduler.ResumeSelectedAsync(selection.Select(row=>row.Job.Id)); break;
-                case "stop": foreach (var row in selection) if (row.Job.State == DownloadState.Running) await _app.Engine.PauseAsync(row.Job.Id); break;
-                case "stopAll": await _app.Scheduler.StopAllAsync(); foreach (var row in _rows.ToArray()) if (row.Job.State == DownloadState.Running) await _app.Engine.PauseAsync(row.Job.Id); break;
+                case "stop": await _app.Scheduler.PauseSelectedAsync(selection.Select(row=>row.Job.Id)); break;
+                case "stopAll": await _app.Scheduler.StopAllAsync(); await _app.Scheduler.PauseSelectedAsync((await _app.Engine.SnapshotAsync()).Where(job=>job.State!=DownloadState.Completed).Select(job=>job.Id)); break;
                 case "delete":
                     if(selection.Length>0){var jobs=selection.Select(r=>r.Job).ToArray();if(!DownloadRemoval.NeedsDiskChoice(jobs))await DownloadRemoval.ExecuteAsync(_app.Engine,jobs,false);else{var remove=new RemoveDownloadsWindow(_locale,jobs){Owner=this};if(remove.ShowDialog()==true)await DownloadRemoval.ExecuteAsync(_app.Engine,jobs,remove.DeleteFiles);}}break;
                 case "clearDone": foreach (var row in _rows.Where(row => row.Job.State == DownloadState.Completed).ToArray()) await _app.Engine.RemoveAsync(row.Job.Id); break;
@@ -309,7 +312,7 @@ public sealed class MainWindow : Window
     private void OpenProgress(string id)
     {
         if (_progressWindows.TryGetValue(id, out var existing)) { existing.Show(); if (existing.WindowState == WindowState.Minimized) existing.WindowState = WindowState.Normal; existing.Activate(); return; }
-        var progress = new ProgressWindow(_app.Engine, _locale, id, new ProgressViewOptions(Preference("progressSpeedTab", true), Preference("progressCompletionTab", true), Preference("progressHideTab", true)),resumeId=>_app.Scheduler.ResumeSelectedAsync([resumeId])) { Owner = this }; _progressWindows[id] = progress; progress.Closed += (_, _) => _progressWindows.Remove(id); progress.Show();
+        var progress = new ProgressWindow(_app.Engine, _locale, id, new ProgressViewOptions(Preference("progressSpeedTab", true), Preference("progressCompletionTab", true), Preference("progressHideTab", true)),resumeId=>_app.Scheduler.ResumeSelectedAsync([resumeId]),pauseId=>_app.Scheduler.PauseSelectedAsync([pauseId])) { Owner = this }; _progressWindows[id] = progress; progress.Closed += (_, _) => _progressWindows.Remove(id); progress.Show();
     }
     private void OpenSettings(string section) => new SettingsWindow(_app.Settings, _locale, _app.Schema, _app.ApplySettings, section) { Owner = this }.ShowDialog();
 
