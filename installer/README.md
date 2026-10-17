@@ -1,4 +1,4 @@
-# Windows installer — 0.5.6 preview
+# Windows installer — 0.5.7 preview
 
 Build on Windows using the .NET 10 SDK and Inno Setup 6.7.3:
 
@@ -19,7 +19,7 @@ The included extensions are version 0.5.3 with a toolbar ON/OFF action. Standard
 For isolated installation tests, compile with:
 
 ```powershell
-ISCC /DSetupAppId=83018A7C-D1CA-4E54-9510-B464A2540420 /DSetupFileName=AAA-Download-Manager-0.5.6-Isolated-Test /DIsolatedTest installer/DownloadManager.iss
+ISCC /DSetupAppId=83018A7C-D1CA-4E54-9510-B464A2540420 /DSetupFileName=AAA-Download-Manager-0.5.7-Isolated-Test /DIsolatedTest installer/DownloadManager.iss
 ./installer/smoke-test.ps1 -Root <repository>
 ```
 

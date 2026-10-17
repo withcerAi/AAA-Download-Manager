@@ -41,6 +41,8 @@ public sealed class ProgressWindow : Window
     private readonly Border _completion;
     private readonly Button _pause;
     private readonly Button _stopClose;
+    private readonly Button _hideClose;
+    private readonly TextBlock _closeHint;
     private readonly Button _detailButton;
     private readonly Button _folder;
     private readonly TextBox _limitValue = new() { Text = "512", Width = 130, FlowDirection = FlowDirection.LeftToRight };
@@ -72,10 +74,10 @@ public sealed class ProgressWindow : Window
         TaskbarItemInfo = new TaskbarItemInfo();
         var layout = new DockPanel { Margin = new Thickness(14) }; layout.SetResourceReference(Panel.BackgroundProperty, "Chrome");
         var footer = new DockPanel { Margin = new Thickness(0, 12, 0, 0) }; var actions = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
-        var hide = Ui.Button(locale, "native.hide_window", async (_, _) => await HideToTrayAsync());
+        _hideClose = Ui.Button(locale, "native.hide_window", async (_, _) => await HideToTrayAsync());
         _pause = Ui.Button(locale, "ui.pause", async (_, _) => await TogglePauseAsync()); _pause.SetResourceReference(BackgroundProperty, "Selection"); _pause.SetResourceReference(BorderBrushProperty, "Accent");
         _stopClose = Ui.Button(locale, "native.stop_and_close", async (_, _) => { try { if (_job?.State != DownloadState.Completed) { await engine.PauseAsync(id); await engine.SetQueueAsync(id, false); } Close(); } catch (Exception error) { ShowError(error); } });
-        actions.Children.Add(hide); actions.Children.Add(_pause); actions.Children.Add(_stopClose); DockPanel.SetDock(actions, Dock.Right); footer.Children.Add(actions);
+        actions.Children.Add(_hideClose); actions.Children.Add(_pause); actions.Children.Add(_stopClose); DockPanel.SetDock(actions, Dock.Right); footer.Children.Add(actions);
         _detailButton = Ui.Button(locale, "native.show_details", (_, _) => ToggleDetails()); _detailButton.HorizontalAlignment = HorizontalAlignment.Left; _detailButton.Visibility = viewOptions.ShowDetailsButton ? Visibility.Visible : Visibility.Collapsed; footer.Children.Add(_detailButton); DockPanel.SetDock(footer, Dock.Bottom); layout.Children.Add(footer);
         var top = new DockPanel { Margin = new Thickness(0, 0, 0, 14) }; var icon = DesktopIcons.Create("document", 32); icon.Margin = new Thickness(0, 2, 13, 0); DockPanel.SetDock(icon, Dock.Left); top.Children.Add(icon); var title = new StackPanel(); title.Children.Add(_name); _source.Margin = new Thickness(0, 5, 0, 0); _source.SetResourceReference(TextBlock.ForegroundProperty, "MutedInk"); title.Children.Add(_source); top.Children.Add(title); DockPanel.SetDock(top, Dock.Top); layout.Children.Add(top);
         var body = new StackPanel();
@@ -111,14 +113,26 @@ public sealed class ProgressWindow : Window
         var history = new DataGrid { ItemsSource = _events, Height = 100, RowHeight = 27 }; var time = new DataGridTextColumn { Binding = new System.Windows.Data.Binding(nameof(TransferEvent.Time)), Width = 100 }; locale.Bind(time, DataGridColumn.HeaderProperty, "native.event_time"); history.Columns.Add(time); var message = new DataGridTextColumn { Binding = new System.Windows.Data.Binding(nameof(TransferEvent.Message)), Width = 540 }; locale.Bind(message, DataGridColumn.HeaderProperty, "ui.status"); history.Columns.Add(message); detailTabs.Items.Add(new TabItem { Header = Ui.Label(locale, "ui.event_log"), Content = history }); details.Children.Add(detailTabs);
         var chartContent=new StackPanel{Margin=new Thickness(10)};chartContent.Children.Add(_chart);_chartCaption.SetResourceReference(TextBlock.ForegroundProperty,"MutedInk");_chartCaption.Margin=new Thickness(0,8,0,0);chartContent.Children.Add(_chartCaption);detailTabs.Items.Add(new TabItem{Header=Ui.Label(locale,"native.speed_history"),Content=chartContent});
         _details=Ui.Panel(details);_details.Margin=new Thickness(0,10,0,0);_details.Visibility = Visibility.Collapsed; body.Children.Add(_details);
-        var closeHint = Ui.Label(locale, "native.hide_continues", true); closeHint.FontSize = 11; closeHint.Margin = new Thickness(0, 9, 0, 0); body.Children.Add(closeHint);
+        _closeHint = Ui.Label(locale, "native.hide_continues", true); _closeHint.FontSize = 11; _closeHint.Margin = new Thickness(0, 9, 0, 0); body.Children.Add(_closeHint);
         layout.Children.Add(new ScrollViewer { Content = body, VerticalScrollBarVisibility = ScrollBarVisibility.Auto, HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled }); Content = layout;
         _timer.Tick += async (_, _) => await RefreshForRenderAsync(); Loaded += async (_, _) => { _timer.Start(); await RefreshForRenderAsync(); }; Closed += (_, _) => _timer.Stop();
-        StateChanged+=(_,_)=>{if(WindowState==WindowState.Minimized&&Application.Current is App app&&app.CanHideProgressToTray&&_job is {} job)app.HideDownloadToTray(this,job);};
+        StateChanged+=(_,_)=>{if(WindowState==WindowState.Minimized&&Application.Current is App app&&app.CanHideProgressToTray&&_job is {} job&&job.State!=DownloadState.Completed)app.HideDownloadToTray(this,job);};
         void AddTab(string key, UIElement content) => _tabs.Items.Add(new TabItem { Header = Ui.Label(locale, key), Content = content });
         CheckBox Check(string key) => new() { Content = Ui.Label(locale, key) };
     }
-    private async Task HideToTrayAsync(){try{if(_job is null)await RefreshForRenderAsync();if(_job is {} job&&Application.Current is App app&&app.HideDownloadToTray(this,job))return;WindowState=WindowState.Minimized;}catch(Exception error){ShowError(error);}}
+    private async Task HideToTrayAsync()
+    {
+        try
+        {
+            if(_job?.State==DownloadState.Completed){Close();return;}
+            var job=(await _engine.SnapshotAsync()).FirstOrDefault(item=>item.Id==_id);
+            if(job is null||job.State==DownloadState.Completed){Close();return;}
+            RenderJob(job);
+            if(Application.Current is App app&&app.HideDownloadToTray(this,job))return;
+            WindowState=WindowState.Minimized;
+        }
+        catch(Exception error){ShowError(error);}
+    }
     private void UpdateLimitControls() { var editable = _job?.State != DownloadState.Completed; _limitEnabled.IsEnabled = _remember.IsEnabled = _applyLimit.IsEnabled = editable; _limitValue.IsEnabled = _limitUnit.IsEnabled = editable && _limitEnabled.IsChecked == true; }
     private void ToggleDetails() { _detailsShown = !_detailsShown; _details.Visibility = _detailsShown ? Visibility.Visible : Visibility.Collapsed; Height = Math.Min(_detailsShown ? 780 : 480, SystemParameters.WorkArea.Height - 40); _detailButton.Content = _locale.S(_detailsShown ? "native.hide_details" : "native.show_details"); }
     internal async Task ApplyLimitAsync()
@@ -164,6 +178,9 @@ public sealed class ProgressWindow : Window
         _bar.Value = complete ? 100 : job.Progress; _bar.IsIndeterminate = job.TotalBytes is null && job.MediaTotalParts==0 && running;
         TaskbarItemInfo!.ProgressState = complete ? TaskbarItemProgressState.None : job.State == DownloadState.Failed ? TaskbarItemProgressState.Error : job.State == DownloadState.Paused ? TaskbarItemProgressState.Paused : job.TotalBytes is null && running ? TaskbarItemProgressState.Indeterminate : running ? TaskbarItemProgressState.Normal : TaskbarItemProgressState.None; TaskbarItemInfo.ProgressValue = Math.Clamp(job.Progress / 100d, 0, 1);
         _pause.Content = _locale.S(running ? "ui.pause" : "ui.resume_download"); _pause.IsEnabled = !complete; _stopClose.IsEnabled = !complete;
+        _hideClose.Content=_locale.S(complete?"ui.close":"native.hide_window");
+        _hideClose.IsDefault=complete;
+        _pause.Visibility=_stopClose.Visibility=_closeHint.Visibility=complete?Visibility.Collapsed:Visibility.Visible;
         _completion.Visibility = complete && job.ShowCompletionSummary ? Visibility.Visible : Visibility.Collapsed; _folder.IsEnabled = complete && Directory.Exists(job.Directory); _summary.Text = _locale.S("native.completion_summary", ("size", row.Size));
         _serverMetadata.Text = _locale.S("native.server_metadata", ("status", job.HttpStatus?.ToString(CultureInfo.InvariantCulture) ?? "—"), ("type", job.ContentType ?? "—"));
         _source.ToolTip = job.Url + (job.EffectiveUrl is { } effective && effective != job.Url ? "\n" + _locale.S("native.resolved_url") + " " + effective : "");
@@ -179,6 +196,7 @@ public sealed class ProgressWindow : Window
         {
             _synchronizing = true; var rate = job.SpeedLimitBytesPerSecond ?? _engine.CurrentSettings.BytesPerSecond; _limitEnabled.IsChecked = rate > 0; _limitUnit.SelectedIndex = rate >= 1048576 ? 1 : 0; _limitValue.Text = rate > 0 ? (rate / (_limitUnit.SelectedIndex == 1 ? 1048576m : 1024m)).ToString("0.###", CultureInfo.InvariantCulture) : "512"; _remember.IsChecked = job.RememberSpeedLimit; _showSummary.IsChecked = job.ShowCompletionSummary; _closeWhenDone.IsChecked = job.CloseProgressOnCompletion; _initialized = true; _synchronizing = false; UpdateLimitControls();
         }
+        if(complete&&IsLoaded&&!IsVisible){Close();return;}
         var justCompleted = _seenRunning && complete; if (running) _seenRunning = true; if (justCompleted) { _seenRunning = false; if (IsLoaded && job.CloseProgressOnCompletion) Close(); }
     }
 }
